@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -29,8 +33,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sleek.DataAccess.Core\Sleek.DataAccess.Core.csproj" />
     <ProjectReference Include="..\Sleek.DataAccess.SqlServer\Sleek.DataAccess.SqlServer.csproj" />
-    <ProjectReference Include="..\Sleek.DataAccess\Sleek.DataAccess.Core.csproj" />
   </ItemGroup>
 
 </Project>
