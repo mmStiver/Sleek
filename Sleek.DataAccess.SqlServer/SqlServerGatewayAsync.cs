@@ -6,18 +6,15 @@ using System.Data.SqlClient;
 
 namespace Sleek.DataAccess.SqlServer
 {
-    public class SqlServerGateway :  ISqlServerGateway
+    public partial class SqlServerGateway :  ISqlServerGateway
     {
-
-        private readonly string connectionConfiguration;
-
-        public SqlServerGateway(string connectionString)
-        {
-            connectionConfiguration = connectionString;
-        }
-
         #region IAsyncDataGateway
-        //query scalar
+        /// <summary>
+        /// Executes a SELECT query asynchronously and returns the first column of the first row in the result set as an object.
+        /// </summary>
+        /// <param name="query">The SELECT query to be executed.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result is the first column of the first row in the result set or null if the result set is empty.</returns>
         public async Task<object?> ExecuteAsync(Select query, CancellationToken cancellationToken = default)
             => await ExecuteAsync(query, null, cancellationToken);
         public async Task<object?> ExecuteAsync(Select query, Action< SqlCommand>? Setup = null, CancellationToken cancellationToken = default)
@@ -70,6 +67,12 @@ namespace Sleek.DataAccess.SqlServer
             => await GetReader(Query.Name, CommandType.StoredProcedure, Setup, Mapper, cancellationToken);
 
         //NonQuery
+        /// <summary>
+        /// Executes a non-query statement asynchronously and returns the number of rows affected.
+        /// </summary>
+        /// <param name="Query">The non-query statement to be executed.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result is the number of rows affected.</returns>
         public async Task<int> ExecuteAsync(Write Query, CancellationToken cancellationToken = default)
             => await ExecuteAsync(Query, null, cancellationToken);
         public async Task<int> ExecuteAsync(Write Query, Action<SqlCommand>? Setup, CancellationToken cancellationToken = default)
@@ -79,263 +82,17 @@ namespace Sleek.DataAccess.SqlServer
         {
             return await Post(Query.Text,CommandType.Text, null, cancellationToken);
         }
-      
-        #endregion 
 
-        #region ISyncDataGateway
-
-        //--sync
-        public object? Execute(Select query)
-            => Execute(query, null);
-        public object? Execute(Select query, Action<SqlCommand>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-                using (SqlCommand command = new SqlCommand(query.Text, connection))
-                {
-                    if(Setup != null)
-                        Setup.Invoke(command);
-                    command.CommandType = CommandType.Text;
-                    connection.Open();
-
-                    var scalar = command.ExecuteScalar();
-                    return (scalar is not DBNull)
-                        ? scalar
-                        : null;
-                }
-        }
-        public object? Execute(Select query, object input, Action<SqlCommand, object>? Setup)
-            => GetSingle<object>(query.Text, CommandType.Text, input, Setup);
-        public object? Execute(StoredProcedure procedure)
-            => Execute(procedure, null);
-        public object? Execute(StoredProcedure procedure, Action<SqlCommand>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(procedure.Name, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command);
-
-                command.CommandType = CommandType.StoredProcedure;
-                connection.Open();
-
-                var scalar = command.ExecuteScalar();
-                return (scalar is not DBNull)
-                        ? scalar
-                        : null;
-            }
-        }
-
-        public TOutput? Execute<TOutput>(Select query)
-            => Execute<TOutput>(query, (Action<SqlCommand>?)null);
-        public TOutput? Execute<TOutput>(Select query, Action<SqlCommand>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-                using (SqlCommand command = new SqlCommand(query.Text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command);
-
-                command.CommandType = CommandType.Text;
-                connection.Open();
-                var res = command.ExecuteScalar();
-                return (res is not DBNull)
-                    ? (TOutput)res
-                    : default(TOutput?);
-            }
-        }
-        public TOutput? Execute<TInput, TOutput>(Select query, TInput Input, Action<SqlCommand, TInput>? Setup)
-            => GetSingle<TInput, TOutput>(query.Text, CommandType.Text, Input, Setup);
-        public TOutput? Execute<TOutput>(Select Query, Func<DbDataReader, TOutput> Mapper)
-            => Execute<TOutput>(Query, null, Mapper);
-        public TOutput? Execute<TOutput>(Select Query, Action<SqlCommand>? Setup, Func<DbDataReader, TOutput> Mapper)
-            => GetReader<TOutput>(Query.Text, CommandType.Text, Setup, Mapper);
-
-        public TOutput? Execute<TOutput>(StoredProcedure procedure) 
-            => Execute<TOutput>(procedure, (Action<SqlCommand>?)null);
-        public TOutput? Execute<TOutput>(StoredProcedure procedure, Action<SqlCommand>? Setup)
-            => GetSingle<TOutput>(procedure.Name, CommandType.StoredProcedure, Setup);
-
-        public TOutput? Execute<TOutput>(StoredProcedure procedure, Func<DbDataReader, TOutput> Mapper)
-            => Execute(procedure, null, Mapper);
-        public TOutput? Execute<TOutput>(StoredProcedure procedure, Action<SqlCommand>? Setup, Func<DbDataReader, TOutput> Mapper)
-            => GetReader<TOutput>(procedure.Name, CommandType.StoredProcedure, Setup, Mapper);
-
-        public int Execute(Write Query)
-            => Execute(Query, null);
-        public int Execute(Write Query, Action<SqlCommand>? Setup)
-           => Post(Query.Text, CommandType.Text, Setup);
-
-        public int Execute(DataDefinitionQuery Query)
-        {
-            using (SqlConnection connection = new(this.connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(Query.Text, connection))
-            {
-                command.CommandType = CommandType.Text;
-                connection.Open();
-
-                return command.ExecuteNonQuery();
-            }
-        }
         #endregion
 
-        #region TestConnection
-        public async Task<bool> TestConnectionAsync(CancellationToken cancellationToken)
-        {
-            try
-            {
-                await using (var connection = new SqlConnection(this.connectionConfiguration))
-                {
-                    connection.Open();
-
-                    await using (var command = new SqlCommand("SELECT 1;", connection))
-                    {
-                        await command.ExecuteScalarAsync(cancellationToken);
-                    }
-                }
-                return true;
-            }
-            catch (SqlException)
-            {
-                return false;
-            }
-        }
-
-        public bool TestConnection()
-        {
-            try
-            {
-                using (var connection = new SqlConnection(this.connectionConfiguration))
-                {
-                    connection.Open();
-
-                    using (var command = new SqlCommand("SELECT 1;", connection))
-                    {
-                        command.ExecuteScalar();
-                    }
-                }
-                return true;
-            }
-            catch (SqlException)
-            {
-                return false;
-            }
-        }
-        #endregion
-
-        //Sync
-        private int Post(string text, CommandType commandType, Action<SqlCommand>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command);
-
-                command.CommandType = commandType;
-                connection.Open();
-                return command.ExecuteNonQuery();
-            }
-        }
-        private TOutput? GetSingle<TOutput>(string text,
-           CommandType commandType,
-           Action<SqlCommand>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-                using (SqlCommand command = new SqlCommand(text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command);
-
-                command.CommandType = commandType;
-                connection.Open();
-
-                var scalar = command.ExecuteScalar();
-                return (scalar is not DBNull)
-                    ? (TOutput)scalar
-                    : default(TOutput?); ;
-            }
-        }
-        private TOutput? GetSingle<TOutput>(string text,
-           CommandType commandType,
-           object input,
-           Action<SqlCommand, object>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command, input);
-
-                command.CommandType = commandType;
-                connection.Open();
-
-                var scalar = command.ExecuteScalar();
-                return (scalar is not DBNull)
-                    ? (TOutput)scalar
-                    : default(TOutput?); ;
-            }
-        }
-        private TOutput? GetSingle<Tinput, TOutput>(string text,
-           CommandType commandType,
-           Tinput input,
-           Action<SqlCommand, Tinput>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command, input);
-
-                command.CommandType = commandType;
-                connection.Open();
-
-                var scalar = command.ExecuteScalar();
-                return (scalar is not DBNull)
-                    ? (TOutput)scalar
-                    : default(TOutput?); ;
-            }
-        }
-        private TOutput? GetReader<TOutput>(string text,
-          CommandType commandType,
-           Action<SqlCommand>? Setup,
-          Func<DbDataReader, TOutput> Mapper
-            )
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command);
-
-                command.CommandType = commandType;
-                connection.Open();
-
-                DbDataReader reader = command.ExecuteReader();
-                return Mapper.Invoke(reader);
-            }
-        }
-        private TOutput? GetReader<TInput, TOutput>(string text,
-          CommandType commandType,
-          TInput input,
-           Action<SqlCommand, TInput>? Setup,
-          Func<DbDataReader, TOutput> Mapper
-            )
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command, input);
-
-                command.CommandType = commandType;
-                connection.Open();
-
-                DbDataReader reader = command.ExecuteReader();
-                return Mapper.Invoke(reader);
-            }
-        }
-
-        //Async
+        /// <summary>
+        /// Executes a non-query statement asynchronously and returns the number of rows affected.
+        /// </summary>
+        /// <param name="text">The SQL command text or stored procedure name to be executed.</param>
+        /// <param name="commandType">Specifies how the command text is interpreted, either as a Text command or as a StoredProcedure.</param>
+        /// <param name="Setup">An optional action to perform additional setup for the SqlCommand.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result is the number of rows affected.</returns>
         private async Task<int> Post(string text,
            CommandType commandType,
            Action<SqlCommand>? Setup,
@@ -351,6 +108,7 @@ namespace Sleek.DataAccess.SqlServer
                 return await command.ExecuteNonQueryAsync(cancellationToken);
             }
         }
+
         private async Task<TOutput?> GetSingle<TOutput>(string text,
             CommandType commandType,
             Action<SqlCommand>? Setup,
@@ -392,6 +150,18 @@ namespace Sleek.DataAccess.SqlServer
                     : default(TOutput?); ;
             }
         }
+        /// <summary>
+        /// Executes a query asynchronously and maps the result set to a single output using the provided mapper function.
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input parameter.</typeparam>
+        /// <typeparam name="TOutput">The type of the output object.</typeparam>
+        /// <param name="text">The SQL command text or stored procedure name to be executed.</param>
+        /// <param name="commandType">Specifies how the command text is interpreted, either as a Text command or as a StoredProcedure.</param>
+        /// <param name="input">The input parameter to be used in the SqlCommand setup.</param>
+        /// <param name="Setup">An optional action to perform additional setup for the SqlCommand with the input parameter.</param>
+        /// <param name="Mapper">A function to map the DbDataReader result set to the output object.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result is the output object or null if the result set is empty.</returns>
         private async Task<TOutput?> GetReader<TInput, TOutput>(string text,
              CommandType commandType,
              TInput input,
@@ -471,18 +241,5 @@ namespace Sleek.DataAccess.SqlServer
                 return await Mapper.Invoke(reader);
             }
         }
-
-       //public async Task<object?> ExecuteAsync(Select query, object? input, Action<SqlCommand, object?>? Setup, CancellationToken cancellationToken = default)
-       //    => await GetSingle<TInput, TOutput>(Query.Text, CommandType.Text, Input, Setup);
-
-
-        public TOutput? Execute<TInput, TOutput>(Select Query, TInput Input, Action<SqlCommand, TInput>? Setup, Func<DbDataReader, TOutput> Mapper)
-       => GetReader<TInput, TOutput>(Query.Text, CommandType.Text, Input, Setup, Mapper);
-
-        
-
-      
-
-        
     }
 }
