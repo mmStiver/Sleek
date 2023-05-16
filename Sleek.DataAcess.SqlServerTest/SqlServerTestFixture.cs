@@ -74,10 +74,13 @@ namespace Sleek.DataAcess.SqlServerTest
                     command.ExecuteNonQuery();
                 using (var command = new SqlCommand(TestData.GetUUIDProcedure.Code, connection))
                     command.ExecuteNonQuery();
-                using (var command = new SqlCommand(TestData.InsertAddressProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SqlCommand(TestData.UpdateAddressProcedure.Code, connection))
-                    command.ExecuteNonQuery();
+                if(!ProcExists(connection, TestData.InsertAddressProcedure.Name))
+                    using (var command = new SqlCommand(TestData.InsertAddressProcedure.Code, connection))
+                        command.ExecuteNonQuery();
+
+                if(!ProcExists(connection, "[dbo].[UpdateAddress]"))
+                    using (var command = new SqlCommand(TestData.UpdateAddressProcedure.Code, connection))
+                        command.ExecuteNonQuery();
             }
         }
 
@@ -118,6 +121,30 @@ namespace Sleek.DataAcess.SqlServerTest
                     return tableCount > 0;
                 }
                 
+            }
+            catch (SqlException)
+            {
+                return false;
+            }
+        }
+        public bool ProcExists(SqlConnection connection, string procName)
+        {
+            try
+            {
+                if (connection.State != ConnectionState.Open)
+                    connection.Open();
+
+                using (var command = new SqlCommand(
+                    "SELECT 1 FROM sys.objects WHERE object_id = OBJECT_ID(@procName) AND type in (N'P', N'PC')",
+                    connection))
+                {
+                     command.Parameters.AddWithValue("@procName", procName);
+
+                    object? val = command.ExecuteScalar();
+                    return (val != DBNull.Value) ? ((int)val) == 1: false;
+                    
+                }
+
             }
             catch (SqlException)
             {
