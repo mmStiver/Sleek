@@ -3,6 +3,7 @@ using Sleek.DataAccess.Core.Command;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Sleek.DataAccess.SqlServer
 {
@@ -30,13 +31,14 @@ namespace Sleek.DataAccess.SqlServer
         {
             try
             {
-                await using (var connection = new SqlConnection(this.connectionConfiguration))
+                SqlConnection connection = new SqlConnection(connectionConfiguration);
+                await using (connection.ConfigureAwait(false))
                 {
-                    connection.Open();
-
-                    await using (var command = new SqlCommand("SELECT 1;", connection))
+                    SqlCommand command = new SqlCommand("SELECT 1;", connection);
+                    await using (command.ConfigureAwait(false))
                     {
-                        object? result = await command.ExecuteScalarAsync();
+                        connection.Open();
+                        object? result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 
                         // If the result is null or not equal to 1, the database is not accessible
                         if (result == null || Convert.ToInt32(result) != 1)

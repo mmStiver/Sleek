@@ -10,46 +10,50 @@ namespace Sleek.DataAccess.SqlServer
     {
         #region ISyncDataGateway
 
-        //--sync
+        /// <summary>
+        /// Executes a SQL select query and returns the first column of the first row in the result set returned by the query.
+        /// </summary>
+        /// <param name="query">An instance of the Select class representing the SQL select query.</param>
+        /// <returns>The first column of the first row in the result set, or a null reference if the result set is empty.</returns>
         public object? Execute(Select query)
             => Execute(query, null);
-        public object? Execute(Select query, Action<SqlCommand>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-                using (SqlCommand command = new SqlCommand(query.Text, connection))
-                {
-                    if(Setup != null)
-                        Setup.Invoke(command);
-                    command.CommandType = CommandType.Text;
-                    connection.Open();
 
-                    var scalar = command.ExecuteScalar();
-                    return (scalar is not DBNull)
-                        ? scalar
-                        : null;
-                }
-        }
+        /// <summary>
+        /// Executes a SQL select query using a setup action and returns the first column of the first row in the result set returned by the query.
+        /// </summary>
+        /// <param name="query">An instance of the Select class representing the SQL select query.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>The first column of the first row in the result set, or a null reference if the result set is empty.</returns>
+        public object? Execute(Select query, Action<SqlCommand>? Setup)
+            => GetSingle<object>(query.Text, CommandType.Text, Setup);
+
+        /// <summary>
+        /// Executes a SQL select query using a setup action and an input object and returns the first column of the first row in the result set returned by the query.
+        /// </summary>
+        /// <param name="query">An instance of the Select class representing the SQL select query.</param>
+        /// <param name="input">An object that is used in the setup action.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>The first column of the first row in the result set, or a null reference if the result set is empty.</returns>
         public object? Execute(Select query, object input, Action<SqlCommand, object>? Setup)
             => GetSingle<object>(query.Text, CommandType.Text, input, Setup);
+
+        /// <summary>
+        /// Executes a stored procedure without any setup action and returns the first column of the first row in the result set returned by the procedure.
+        /// </summary>
+        /// <param name="procedure">An instance of the StoredProcedure class representing the stored procedure to execute.</param>
+        /// <returns>The first column of the first row in the result set, or a null reference if the result set is empty.</returns>
         public object? Execute(StoredProcedure procedure)
             => Execute(procedure, null);
+
+        /// <summary>
+        /// Executes a stored procedure using a setup action and returns the first column of the first row in the result set returned by the procedure.
+        /// </summary>
+        /// <param name="procedure">An instance of the StoredProcedure class representing the stored procedure to execute.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>The first column of the first row in the result set, or a null reference if the result set is empty.</returns>
         public object? Execute(StoredProcedure procedure, Action<SqlCommand>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(procedure.Name, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command);
+            => GetSingle<object>(procedure.Name, CommandType.StoredProcedure, Setup);
 
-                command.CommandType = CommandType.StoredProcedure;
-                connection.Open();
-
-                var scalar = command.ExecuteScalar();
-                return (scalar is not DBNull)
-                        ? scalar
-                        : null;
-            }
-        }
         /// <summary>
         /// Executes a Select query and returns the first column of the first row in the result set returned by the query.
         /// </summary>
@@ -57,35 +61,81 @@ namespace Sleek.DataAccess.SqlServer
         /// <returns>An object that contains the value of the first column of the first row in the result set or null if the result set is empty.</returns>
         public TOutput? Execute<TOutput>(Select query)
             => Execute<TOutput>(query, (Action<SqlCommand>?)null);
+        /// <summary>
+        /// Executes a SELECT query using a setup action and maps the result set to an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="TOutput">The type of the result.</typeparam>
+        /// <param name="query">An instance of the Select class representing the query to execute.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>An instance of the specified type representing the result set, or null if the result set is empty.</returns>
         public TOutput? Execute<TOutput>(Select query, Action<SqlCommand>? Setup)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-                using (SqlCommand command = new SqlCommand(query.Text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command);
+            => GetSingle<TOutput>(query.Text, CommandType.Text, Setup);
 
-                command.CommandType = CommandType.Text;
-                connection.Open();
-                var res = command.ExecuteScalar();
-                return (res is not DBNull)
-                    ? (TOutput)res
-                    : default(TOutput?);
-            }
-        }
+        /// <summary>
+        /// Executes a SELECT query with a specific input parameter using a setup action and maps the result set to an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input parameter.</typeparam>
+        /// <typeparam name="TOutput">The type of the result.</typeparam>
+        /// <param name="query">An instance of the Select class representing the query to execute.</param>
+        /// <param name="Input">The input parameter for the query.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>An instance of the specified type representing the result set, or null if the result set is empty.</returns>
         public TOutput? Execute<TInput, TOutput>(Select query, TInput Input, Action<SqlCommand, TInput>? Setup)
             => GetSingle<TInput, TOutput>(query.Text, CommandType.Text, Input, Setup);
+
+        /// <summary>
+        /// Executes a SELECT query and uses a mapper function to map the result set to an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="TOutput">The type of the result.</typeparam>
+        /// <param name="Query">An instance of the Select class representing the query to execute.</param>
+        /// <param name="Mapper">A function to map the result set to an instance of the specified type.</param>
+        /// <returns>An instance of the specified type representing the result set, or null if the result set is empty.</returns>
         public TOutput? Execute<TOutput>(Select Query, Func<DbDataReader, TOutput> Mapper)
             => Execute<TOutput>(Query, null, Mapper);
+
+        /// <summary>
+        /// Executes a SELECT query using a setup action and a mapper function and maps the result set to an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="TOutput">The type of the result.</typeparam>
+        /// <param name="Query">An instance of the Select class representing the query to execute.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <param name="Mapper">A function to map the result set to an instance of the specified type.</param>
+        /// <returns>An instance of the specified type representing the result set, or null if the result set is empty.</returns>
         public TOutput? Execute<TOutput>(Select Query, Action<SqlCommand>? Setup, Func<DbDataReader, TOutput> Mapper)
             => GetReader<TOutput>(Query.Text, CommandType.Text, Setup, Mapper);
+
+        /// <summary>
+        /// Executes a SELECT query with a specific input parameter using a setup action and a mapper function, and maps the result set to an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input parameter.</typeparam>
+        /// <typeparam name="TOutput">The type of the result.</typeparam>
+        /// <param name="Query">An instance of the Select class representing the query to execute.</param>
+        /// <param name="Input">The input parameter for the query.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <param name="Mapper">A function to map the result set to an instance of the specified type.</param>
+        /// <returns>An instance of the specified type representing the result set, or null if the result set is empty.</returns>
         public TOutput? Execute<TInput, TOutput>(Select Query, TInput Input, Action<SqlCommand, TInput>? Setup, Func<DbDataReader, TOutput> Mapper)
-      => GetReader<TInput, TOutput>(Query.Text, CommandType.Text, Input, Setup, Mapper);
-        public TOutput? Execute<TOutput>(StoredProcedure procedure) 
+            => GetReader<TInput, TOutput>(Query.Text, CommandType.Text, Input, Setup, Mapper);
+
+        /// <summary>
+        /// Executes a stored procedure and maps the result set to an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="TOutput">The type of the result.</typeparam>
+        /// <param name="procedure">An instance of the StoredProcedure class representing the procedure to execute.</param>
+        /// <returns>An instance of the specified type representing the result set, or null if the result set is empty.</returns>
+        public TOutput? Execute<TOutput>(StoredProcedure procedure)
             => Execute<TOutput>(procedure, (Action<SqlCommand>?)null);
-       
+
+        /// <summary>
+        /// Executes a stored procedure with a specific setup action, and maps the result set to an instance of the specified type.
+        /// </summary>
+        /// <typeparam name="TOutput">The type of the result.</typeparam>
+        /// <param name="procedure">An instance of the StoredProcedure class representing the procedure to execute.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>An instance of the specified type representing the result set, or null if the result set is empty.</returns>
         public TOutput? Execute<TOutput>(StoredProcedure procedure, Action<SqlCommand>? Setup)
             => GetSingle<TOutput>(procedure.Name, CommandType.StoredProcedure, Setup);
+
         /// <summary>
         /// Executes a stored procedure and maps the result set to a single output using the provided mapper function.
         /// </summary>
@@ -95,6 +145,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <returns>The output object or null if the result set is empty.</returns>
         public TOutput? Execute<TOutput>(StoredProcedure procedure, Func<DbDataReader, TOutput> Mapper)
             => Execute(procedure, null, Mapper);
+       
         /// <summary>
         /// Executes a stored procedure and maps the result set to a single output using the provided mapper function.
         /// </summary>
@@ -106,10 +157,23 @@ namespace Sleek.DataAccess.SqlServer
         public TOutput? Execute<TOutput>(StoredProcedure procedure, Action<SqlCommand>? Setup, Func<DbDataReader, TOutput> Mapper)
             => GetReader<TOutput>(procedure.Name, CommandType.StoredProcedure, Setup, Mapper);
 
+        /// <summary>
+        /// Executes a write query and returns the number of rows affected.
+        /// </summary>
+        /// <param name="Query">An instance of the Write class representing the query to execute.</param>
+        /// <returns>The number of rows affected by the query.</returns>
         public int Execute(Write Query)
             => Execute(Query, null);
+
+        /// <summary>
+        /// Executes a write query with a specific setup action and returns the number of rows affected.
+        /// </summary>
+        /// <param name="Query">An instance of the Write class representing the query to execute.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>The number of rows affected by the query.</returns>
         public int Execute(Write Query, Action<SqlCommand>? Setup)
            => Post(Query.Text, CommandType.Text, Setup);
+
         /// <summary>
         /// Executes a DataDefinitionQuery and returns the number of rows affected.
         /// </summary>
