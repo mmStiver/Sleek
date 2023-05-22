@@ -7,6 +7,16 @@
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
+
+	  <PackageId>Sleek.DataAccess.SqlServer</PackageId>
+	  <Version>1.0.5</Version>
+	  <Authors>Michael Stiver-Balla</Authors>
+	  <Product>Sleek DataAccess Library for Sql Server</Product>
+	  <Description>A sleek and modern data access library for all your Sql Serverneeds.</Description>
+	  <Copyright>Copyright © 2023</Copyright>
+	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>

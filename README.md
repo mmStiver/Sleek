@@ -62,7 +62,7 @@ var result = dataGateway.Execute(query, cmd => cmd.Parameters.AddWithValue("@Use
 
 To map the result set to a custom data structure, provide a mapper function.
 
-```csharp
+```
 
 var query = new Select("SELECT * FROM Users");
 var users = dataGateway.Execute<IEnumerable<User>>(query, reader =>
@@ -117,7 +117,7 @@ var result = await dataGateway.ExecuteAsync(query);
 For more complex examples, refer to the sections on using a setup lambda, mapper, or both in the synchronous execution part, and replace the Execute method with `
 User
 Add a section for using write queries (using a setup lambda), DDL queries and calling stored procs (using a mapper)
-ChatGPT
+
 
 ## Write Queries and DDL Queries
 
