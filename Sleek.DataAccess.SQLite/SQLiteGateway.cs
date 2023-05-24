@@ -2,7 +2,6 @@
 using Sleek.DataAccess.Core.Command;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Data.SQLite;
 
 namespace Sleek.DataAccess.SQLite
@@ -31,12 +30,12 @@ namespace Sleek.DataAccess.SQLite
             throw new NotImplementedException();
         }
 
-        public object? Execute(Select query, Action<SqlCommand>? Setup)
+        public object? Execute(Select query, Action<DbCommand>? Setup)
         {
             throw new NotImplementedException();
         }
 
-        public object? Execute(Select query, object input, Action<SqlCommand, object>? Setup)
+        public object? Execute(Select query, object input, Action<DbCommand, object>? Setup)
         {
             throw new NotImplementedException();
         }
@@ -46,12 +45,12 @@ namespace Sleek.DataAccess.SQLite
             throw new NotImplementedException();
         }
 
-        public TOutput? Execute<TOutput>(Select query, Action<SqlCommand>? Setup)
+        public TOutput? Execute<TOutput>(Select query, Action<DbCommand>? Setup)
         {
             throw new NotImplementedException();
         }
 
-        public TOutput? Execute<TInput, TOutput>(Select query, TInput Input, Action<SqlCommand, TInput>? Setup)
+        public TOutput? Execute<TInput, TOutput>(Select query, TInput Input, Action<DbCommand, TInput>? Setup)
         {
             throw new NotImplementedException();
         }
@@ -61,12 +60,12 @@ namespace Sleek.DataAccess.SQLite
             throw new NotImplementedException();
         }
 
-        public TOutput? Execute<TOutput>(Select Query, Action<SqlCommand>? Setup, Func<DbDataReader, TOutput> Mapper)
+        public TOutput? Execute<TOutput>(Select Query, Action<DbCommand>? Setup, Func<DbDataReader, TOutput> Mapper)
         {
             throw new NotImplementedException();
         }
 
-        public TOutput? Execute<TInput, TOutput>(Select Query, TInput Input, Action<SqlCommand, TInput>? Setup, Func<DbDataReader, TOutput> Mapper)
+        public TOutput? Execute<TInput, TOutput>(Select Query, TInput Input, Action<DbCommand, TInput>? Setup, Func<DbDataReader, TOutput> Mapper)
         {
             throw new NotImplementedException();
         }
@@ -76,7 +75,7 @@ namespace Sleek.DataAccess.SQLite
             throw new NotImplementedException();
         }
 
-        public int Execute(Write query, Action<SqlCommand>? Setup)
+        public int Execute(Write query, Action<DbCommand>? Setup)
         {
             throw new NotImplementedException();
         }
@@ -85,6 +84,9 @@ namespace Sleek.DataAccess.SQLite
         {
             throw new NotImplementedException();
         }
+
+
+
 
         public bool TestConnection()
         {

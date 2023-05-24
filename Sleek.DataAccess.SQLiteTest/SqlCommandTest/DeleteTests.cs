@@ -1,76 +1,16 @@
-﻿using System.Data.SqlClient;
+﻿
+using System.Data.Common;
 
 namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
 {
-    public class DeleteTests : IClassFixture<SqlServerTestFixture>, IDisposable
+    public class DeleteTests : IClassFixture<SQLiteTestFixture>, IDisposable
     {
 
-        ISqlServerGateway facade;
-        string connectionString;
-        public DeleteTests(SqlServerTestFixture context)
+        ISQLiteGateway facade;
+        public DeleteTests()
         {
-            facade = new SqlServerGateway(context.connectionString);
-            connectionString = context.connectionString;
-
-            using (var connection = new SqlConnection(context.connectionString))
-            {
-                connection.Open();
-
-                using (var command = new SqlCommand(TestData.CreatePhoneTable, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
-                using (var command = new SqlCommand(TestData.InsertIntoPhoneNumTable, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
-                    ;
-                
-            }
+            facade = new SQLiteGateway(TestData.localConnection);
         }
-        #region ExecuteAsync
-        [Fact]
-        public async Task ExecuteAsync_DeleteSinglePhone_ReturnDeleteCount()
-        {
-            var query = new Write()
-            {
-                Text = """
-                Delete From PhoneNumber 
-                Where Id = 1 
-                """
-            };
-            object? result = await facade.ExecuteAsync(query);
-            Assert.Equal(1, result);
-        }
-        [Fact]
-        public async Task ExecuteAsync_DeleteAllPhonees_ReturnDeleteCount()
-        {
-            var query = new Write()
-            {
-                Text = """
-                Delete From PhoneNumber
-                """
-            };
-            object? result = await facade.ExecuteAsync(query);
-            Assert.Equal(5, result);
-        }
-        [Fact]
-        public async Task ExecuteAsync_DeleteparameterizedSinglePhone_ReturnDeleteCount()
-        {
-            var query = new Write()
-            {
-                Text = """
-                Delete From PhoneNumber 
-                Where Id = 1 
-                """
-            };
-            var Setup = (SqlCommand command) => {
-                command.Parameters.Add(new SqlParameter("@PhoneId", 1));
-            };
-            object? result = await facade.ExecuteAsync(query, Setup);
-            Assert.Equal(1, result);
-        }
-        #endregion
 
         #region Execute
         [Fact]
@@ -108,8 +48,8 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 Where Id = 1 
                 """
             };
-            var Setup = (SqlCommand command) => {
-                command.Parameters.Add(new SqlParameter("@PhoneId", 1));
+            var Setup = (DbCommand command) => {
+                command.Parameters.Add(new SQLiteParameter("@PhoneId", 1));
             };
             object? result =  facade.Execute(query, Setup);
             Assert.Equal(1, result);
@@ -118,15 +58,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
 
         public void Dispose()
         {
-            using (var connection = new SqlConnection(this.connectionString))
-            {
-                connection.Open();
-
-                using (var command = new SqlCommand("DROP TABLE dbo.PhoneNumber", connection))
-                {
-                    command.ExecuteNonQuery();
-                }
-            }
+           
         }
     }
 }

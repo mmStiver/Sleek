@@ -2,25 +2,23 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Threading;
+using Sleek.DataAcess.SqlServerTest;
 
-namespace Sleek.DataAcess.SqlServerTest
-{
-    public class SQLiteTestFixture : IDisposable
+public class SQLiteTestFixture : IDisposable
     {
         public readonly string connectionString;
         private static readonly object GlobalLock = new object();
 
         public SQLiteTestFixture()
         {
-            this.connectionString = TestData.localConnection;
-                var connectionString = $"Data Source=:memory:;Version=3";
+                var connectionString = TestData.localConnection;
                 var connection = new SQLiteConnection(connectionString);
                 connection.Open();
 
             lock (GlobalLock) {
                 SetupData();
             }
-            }
+        }
         
         private void SetupData()
         { 
@@ -39,7 +37,6 @@ namespace Sleek.DataAcess.SqlServerTest
             }
 
             // Connect to the newly created database
-
             using (var connection = new SQLiteConnection(this.connectionString))
             {
                 connection.Open();
@@ -58,31 +55,10 @@ namespace Sleek.DataAcess.SqlServerTest
                         command.ExecuteNonQuery();
                     }
                 }
-
-                using (var command = new SQLiteCommand(TestData.GetPersonProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SQLiteCommand(TestData.GetNullProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SQLiteCommand(TestData.GetIntProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SQLiteCommand(TestData.GetNumericProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SQLiteCommand(TestData.GetDateProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SQLiteCommand(TestData.GetDateOffsetProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SQLiteCommand(TestData.GetUUIDProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SQLiteCommand(TestData.InsertAddressProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-                using (var command = new SQLiteCommand(TestData.UpdateAddressProcedure.Code, connection))
-                    command.ExecuteNonQuery();
-
+           
                 using (var command = new SQLiteCommand(@"PRAGMA journal_mode = 'wal'", connection))
                     command.ExecuteNonQuery();
-
-
-                
+ 
             }
         }
 
@@ -158,4 +134,3 @@ namespace Sleek.DataAcess.SqlServerTest
             // }
         }
     }
-}
