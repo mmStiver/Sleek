@@ -10,12 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="SqlDataReader\**" />
-    <EmbeddedResource Remove="SqlDataReader\**" />
-    <None Remove="SqlDataReader\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
     <PackageReference Include="xunit" Version="2.4.2" />
@@ -32,6 +26,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Sleek.DataAccess.Core\Sleek.DataAccess.Core.csproj" />
     <ProjectReference Include="..\Sleek.DataAccess.SQLite\Sleek.DataAccess.SQLite.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataReaderTest\" />
   </ItemGroup>
 
 </Project>

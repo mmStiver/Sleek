@@ -7,41 +7,38 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Sleek.DataAcess.SqlServerTest
+namespace Sleek.DataAccess.SQLiteTest
 {
     internal static class TestData
     {
-        public static readonly string TestDatabase = "SleekTestDB";
         internal static readonly string TestTableName = "DummyPerson";
 
         public static readonly string localConnection = @"Data Source=:memory:;Version=3";
-
-        public static readonly string CreateDatabase = "CREATE DATABASE {0}";
+        public static readonly string nonexistantConnection = @"Data Source=/path/to/database.db;Version=3;";
 
         public static readonly string CreatePersonTable = """
-            -- Create the Person table
             CREATE TABLE DummyPerson (
-                Id INT IDENTITY(1,1) PRIMARY KEY,
-                FirstName NVARCHAR(50),
-                LastName NVARCHAR(50),
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                FirstName TEXT,
+                LastName TEXT,
                 BirthDate DATE,
-                Age SMALLINT,
-                IsActive BIT,
-                Height FLOAT,
-                Weight DECIMAL(5, 2),
-                CreatedAt DATETIME2,
-                UpdatedAt DATETIMEOFFSET,
-                AdditionalInfo XML,
-                ProfileImage VARBINARY(MAX),
-                Salary MONEY,
-                PhoneNumber CHAR(10),
-                UniqueId UNIQUEIDENTIFIER
+                Age INTEGER,
+                IsActive INTEGER,
+                Height REAL,
+                Weight NUMERIC(5, 2),
+                CreatedAt TEXT,
+                UpdatedAt TEXT,
+                AdditionalInfo TEXT,
+                ProfileImage BLOB,
+                Salary NUMERIC,
+                PhoneNumber TEXT,
+                UniqueId TEXT
             );
             """;
         public static readonly string CreateAddressTable = """
             -- Create the Person table
-            CREATE TABLE Address (
-                Id INT IDENTITY(1,1) PRIMARY KEY,
+                CREATE TABLE Address (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 StreetAddress NVARCHAR(100) NOT NULL,
                 City NVARCHAR(50) NOT NULL,
                 State NVARCHAR(50) NULL,
@@ -50,38 +47,25 @@ namespace Sleek.DataAcess.SqlServerTest
             );
             """;
 
-        public static readonly string
-            CreatePhoneTable = """
-                        CREATE TABLE PhoneNumber (
-                Id INT IDENTITY(1,1) PRIMARY KEY,
-                Number CHAR(10) NOT NULL
-            );
-            """;
-
-        public static readonly string InsertIntoPersonTable = """
-            INSERT INTO DummyPerson (FirstName, LastName, BirthDate, Age, IsActive, Height, Weight, CreatedAt, UpdatedAt, AdditionalInfo, ProfileImage, Salary, PhoneNumber, UniqueId)
-            VALUES ('John', 'Doe', '1987-05-01', 36, 1, 180.5, 75.2, '2023-05-01T10:30:00', '2023-05-01T10:30:00+00:00', '<info><hobby>Coding</hobby></info>', NULL, 55000, '5551234567', '0136c08d-e0c2-4f96-8ab5-7e0a8b4923af'),
-            ('Jane', 'Doe', '1990-10-10', 32, 1, 165.3, 58.7, '2023-05-01T10:35:00', '2023-05-01T10:35:00+00:00', '<info><hobby>Painting</hobby></info>', NULL, 58000, '5552345678', 'd4bb9acc-02e0-4854-b10c-e3cb2773f246'),
-            ('Alice', 'Johnson', '1992-03-15', 31, 0, 170.0, 62.5, '2023-05-01T10:40:00', '2023-05-01T10:40:00+00:00', '<info><hobby>Photography</hobby></info>', NULL, 62000, '5553456789', 'caec0826-e45c-4ef1-9086-cb8d8283a572'),
-            ('Bob', 'Smith', '1985-08-20', 37, 1, 182.2, 80.5, '2023-05-01T10:45:00', '2023-05-01T10:45:00+00:00', '<info><hobby>Traveling</hobby></info>', NULL, 64000, '5554567890', '11804a12-2c9e-4690-af3a-0c2a806458e0'),
-            ('Charlie', 'Brown', '1997-04-30', 25, 0, 175.8, 68.5, '2023-05-01T10:47:00','2023-05-01T10:53:00+00:00', '<info><hobby>Boardgames</hobby></info>', NULL, 67000, '2345678901', '2b32d8af-35bb-4e1c-84f1-3c66d063e958')
-            """;
-
+        public static readonly string CreatePhoneTable = """
+            CREATE TABLE PhoneNumber (Id INTEGER PRIMARY KEY AUTOINCREMENT, Value TEXT)
+         """;
+        public static readonly string InsertPhoneTable = """ 
+        INSERT INTO PhoneNumber (Value) VALUES ('1234567890'),('9876543210'),('4567890123'),('7890123456'),('2345678901')
+        """;
         public static readonly string InsertIntoAddressTable = """
             INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
             VALUES('987 Elm St', 'San Francisco', 'CA', '94102', 'USA'),
                 ('654 Pine St', 'Austin', 'TX', '73301', 'USA');
             """;
-
-        public static readonly string InsertIntoPhoneNumTable = """
-            INSERT INTO PhoneNumber (Number)
-            VALUES ('1234567890'),
-            ('2345678901'),
-            ('3456789012'),
-            ('4567890123'),
-            ('5678901234');
+        public static readonly string InsertIntoPersonTable = """
+            INSERT INTO DummyPerson (FirstName, LastName, BirthDate, Age, IsActive, Height, Weight, CreatedAt, UpdatedAt,AdditionalInfo,ProfileImage,Salary,PhoneNumber,UniqueId)
+            VALUES ('John', 'Doe', '1980-06-15', 30, 1, 1.75, 75.5, '2023-05-01', '2023-05-01', 'Some additional info 1', x'0123456789ABCDEF', 50000.50, '1234567890', 'ABC123'),
+            ('Jane', 'Smith', '1992-02-28', 29, 0, 1.63, 61.2, '2023-05-02', '2023-05-03', 'Some additional info 2', x'FEDCBA9876543210', 63000.75, '9876543210', 'DEF456'),
+            ('Michael', 'Johnson', '1985-11-10', 36, 1, 1.82, 82.7, '2023-05-03', '2023-05-04', 'Some additional info 3', x'1122334455667788', 75000.25, '4567890123', 'GHI789'),
+            ('Emily', 'Brown', '1998-08-22', 23, 1, 1.67, 54.9, '2023-05-04', '2023-05-05', 'Some additional info 4', x'AABBCCDDEEFF0011', 40000.80, '7890123456', 'JKL012'),
+            ('Daniel', 'Wilson', '1995-04-03', 26, 0, 1.79, 68.3, '2023-05-05', '2023-05-06', 'Some additional info 5', x'0011223344556677', 85000.60, '2345678901', 'MNO345');
             """;
 
-   
     }
 }

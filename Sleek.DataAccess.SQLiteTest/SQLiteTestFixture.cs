@@ -1,136 +1,65 @@
 using System.Data;
-using System.Data.SqlClient;
 using System.Data.SQLite;
-using System.Threading;
-using Sleek.DataAcess.SqlServerTest;
+using Xunit.Extensions;
+using Xunit.Abstractions;
+using Xunit.Sdk;
+using Sleek.DataAcess;
+using System.Data.Common;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+using static System.Net.Mime.MediaTypeNames;
 
-public class SQLiteTestFixture : IDisposable
+namespace Sleek.DataAccess.SQLiteTest
+{
+
+    public class SQLiteTestFixture : IDisposable
     {
-        public readonly string connectionString;
-        private static readonly object GlobalLock = new object();
-
+        public readonly SQLiteConnection connection;
         public SQLiteTestFixture()
         {
-                var connectionString = TestData.localConnection;
-                var connection = new SQLiteConnection(connectionString);
-                connection.Open();
+            connection = new SQLiteConnection(TestData.localConnection);
+            connection.Open();
+            using (var command1 = new SQLiteCommand(@"PRAGMA journal_mode = 'wal'", connection))
+                command1.ExecuteNonQuery();
 
-            lock (GlobalLock) {
-                SetupData();
+            using (var command = new SQLiteCommand(TestData.CreatePersonTable, connection))
+            {
+                var resl = command.ExecuteNonQuery();
+
+                Console.WriteLine(resl);
+            }
+
+            using (var command = new SQLiteCommand(TestData.InsertIntoPersonTable, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            byte[] testData = { 0x12, 0x34, 0x56, 0x78, 0x90 };
+            using (SQLiteCommand command = new SQLiteCommand(connection))
+            {
+                command.CommandText = $"UPDATE {TestData.TestTableName} SET ProfileImage = @blobData WHERE Id = 1";
+                command.Parameters.AddWithValue("@blobData", testData);
+                command.ExecuteNonQuery();
+
             }
         }
         
-        private void SetupData()
-        { 
-            // Create test database
-            if (!TestConnection(this.connectionString))
-            {
-                using (var connection = new SQLiteConnection(this.connectionString))
-                {
-                    connection.Open();
-                    var query = string.Format(TestData.CreateDatabase, TestData.TestDatabase);
-                    using (var command = new SQLiteCommand(query, connection))
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                }
-            }
-
-            // Connect to the newly created database
-            using (var connection = new SQLiteConnection(this.connectionString))
-            {
-                connection.Open();
-
-                // Create a table
-                if (!TableExists(connection, TestData.TestTableName))
-                {
-                    using (var command = new SQLiteCommand(TestData.CreatePersonTable, connection))
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                
-                    // Insert data
-                    using (var command = new SQLiteCommand(TestData.InsertIntoPersonTable, connection))
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                }
-           
-                using (var command = new SQLiteCommand(@"PRAGMA journal_mode = 'wal'", connection))
-                    command.ExecuteNonQuery();
- 
-            }
-        }
-
-        public bool TestConnection(string connectionString)
-        {
-            try
-            {
-                using (var connection = new SQLiteConnection(connectionString))
-                {
-                    connection.Open();
-
-                    using (var command = new SQLiteCommand("SELECT SYSDATETIME();", connection))
-                    {
-                        command.ExecuteScalar();
-                    }
-                }
-                return true;
-            }
-            catch (SqlException)
-            {
-                return false;
-            }
-        }
-        public bool TableExists(SQLiteConnection connection, string tableName)
-        {
-            try
-            {
-                if(connection.State != ConnectionState.Open) 
-                    connection.Open();
-
-                using (var command = new SQLiteCommand(
-                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @TableName;",
-                    connection))
-                {
-                    command.Parameters.AddWithValue("@TableName", tableName);
-
-                    int tableCount = (int)command.ExecuteScalar();
-                    return tableCount > 0;
-                }
-                
-            }
-            catch (SqlException)
-            {
-                return false;
-            }
-        }
-        public void TruncateData(SQLiteConnection connection, string tableName)
-        {
-            if (connection.State != System.Data.ConnectionState.Open)
-                connection.Open();
-
-            using (var command = new SQLiteCommand(
-                $"TRUNCATE TABLE {tableName};",
-                connection))
-            {
-                var _ = command.ExecuteScalar();
-            }
-        }
-
 
         public void Dispose()
         {
-           // using (var connection = new SqlConnection(this.connectionString))
-           //     TruncateData(connection, TestData.TestTableName);
-       // }
-            // {
-            //     connection.Open();
-            //
-            //     using (var command = new SQLiteCommand($"CREATE TABLE #TestTemp", connection))
-            //     {
-            //         command.ExecuteNonQuery();
-            //     }
-            // }
+            if (connection.State != System.Data.ConnectionState.Closed)
+                connection.Close();
+
+            connection.Dispose();
         }
     }
+
+
+    [CollectionDefinition("SQLite Database collection")]
+    public class SQLiteCollection : ICollectionFixture<SQLiteTestFixture>
+    {
+        // This class has no code, and is never created. Its purpose is simply
+        // to be the place to apply [CollectionDefinition] and all the
+        // ICollectionFixture<> interfaces.
+    }
+
+}

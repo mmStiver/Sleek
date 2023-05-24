@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sleek.DataAcess.SqlServerTest
+namespace Sleek.DataAccess.SqlServerTest
 {
     public class DummyPerson
     {

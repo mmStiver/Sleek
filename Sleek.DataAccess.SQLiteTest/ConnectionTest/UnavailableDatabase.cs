@@ -2,7 +2,7 @@
 using System.Data.SqlClient;
 using System.Data.SQLite;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlConnectionTest
+namespace Sleek.DataAcess.SQLiteTest.ConnectionTest
 {
     public class UnavailableDatabase
     {
@@ -10,7 +10,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlConnectionTest
         ISQLiteGateway facade;
         public UnavailableDatabase()
         {
-            facade = new SQLiteGateway(TestData.localConnection);
+            facade = new SQLiteGateway(TestData.nonexistantConnection);
         }
 
         [Fact]

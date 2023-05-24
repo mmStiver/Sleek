@@ -1,15 +1,15 @@
 ﻿using Sleek.DataAccess.SQLite;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlConnectionTest
+namespace Sleek.DataAcess.SQLiteTest.ConnectionTest
 {
-    public class AvailableDatabase : IClassFixture<SQLiteTestFixture>
+    public class AvailableDatabase
     {
         ISQLiteGateway gateway;
-        public AvailableDatabase(SQLiteTestFixture context)
+        public AvailableDatabase()
         {
             TimeSpan timeout = TimeSpan.FromSeconds(5);
 
-            gateway = new SQLiteGateway(context.connectionString);
+            gateway = new SQLiteGateway(TestData.localConnection);
         }
 
         [Fact]
@@ -23,9 +23,9 @@ namespace Sleek.DataAcess.SqlServerTest.SqlConnectionTest
         public void Execute_SendDDLCommand_CreateObject()
         {
             int result = gateway.Execute(
-                new DataDefinitionQuery() { Text = @"CREATE TABLE #TestTemp (Id tinyint);" }
+                new DataDefinitionQuery() { Text = @"CREATE TABLE CreateObject (Id INTEGER);" }
             );
-            Assert.Equal(-1, result);
+            Assert.Equal(0, result);
 
         }
     }

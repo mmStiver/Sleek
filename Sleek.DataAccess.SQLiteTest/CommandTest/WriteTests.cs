@@ -1,17 +1,92 @@
-﻿using System.Data.Common;
+﻿using Sleek.DataAccess.SQLiteTest;
+using System.Data.Common;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
+namespace Sleek.DataAcess.SQLiteTest.CommandTest
 {
-    public class WriteTests 
+    [Collection("SQLite Database collection")]
+    public class WriteTests : IDisposable
     {
 
-        ISQLiteGateway facade;
-        public WriteTests()
+        ISQLiteGateway gateway;
+        public WriteTests(SQLiteTestFixture testFixture)
         {
-            facade = new SQLiteGateway(TestData.localConnection);
+            gateway = new SQLiteGateway(testFixture.connection);
+            gateway.Execute(new DataDefinitionQuery() { Text = TestData.CreatePhoneTable });
+            gateway.Execute(new DataDefinitionQuery() { Text = TestData.CreateAddressTable });
+            gateway.Execute(new Write() { Text = TestData.InsertPhoneTable });
+            gateway.Execute(new Write() { Text = TestData.InsertIntoAddressTable });
         }
 
-        #region Execute
+        #region ExecuteDelete
+        [Fact]
+        public void Execute_DeleteNonexistantId_ReturnDeleteCountOfNone()
+        {
+
+            var query = new Write()
+            {
+                Text = """
+                Delete From PhoneNumber 
+                Where Id = 100
+                """
+            };
+            object? result = gateway.Execute(query);
+
+            Assert.Equal(0, result);
+        }
+        [Fact]
+        public void Execute_DeleteSinglePhoneById_ReturnDeleteCountOfOne()
+        {
+
+            var query = new Write()
+            {
+                Text = """
+                Delete From PhoneNumber 
+                Where Id = 1 
+                """
+            };
+            object? result = gateway.Execute(query);
+
+            Assert.Equal(1, result);
+        }
+        [Fact]
+        public void Execute_DeleteAllPhones_ReturnDeleteCount()
+        {
+            long count1 = gateway.Execute<long>(new Select() { Text = "SELECT COUNT(*) FROM PhoneNumber" });
+
+            var query = new Write()
+            {
+                Text = """
+                Delete From DummyPerson
+                """
+            };
+            object? result = gateway.Execute(query);
+
+            long count2 = gateway.Execute<long>(new Select() { Text = "SELECT COUNT(*) FROM PhoneNumber" });
+
+
+            Assert.Equal(5, result);
+        }
+        [Fact]
+        public void Execute_DeleteparameterizedSinglePhone_ReturnDeleteCount()
+        {
+            var query = new Write()
+            {
+                Text = """
+                Delete From PhoneNumber 
+                Where Id = @Id 
+                """
+            };
+            var Setup = (DbCommand command) => {
+                command.Parameters.Add(new SQLiteParameter("@Id", 1));
+            };
+            object? result = gateway.Execute(query, Setup);
+            Assert.Equal(1, result);
+        }
+
+    
+        #endregion
+
+        #region ExecuteInsert
         [Fact]
         public void Execute_InsertNewAddressIntoTable_ReturnsInsertCountAsInt()
         {
@@ -22,7 +97,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 VALUES('123 Main St', 'New York', 'NY', '10001', 'USA'); 
                 """
             };
-            object? result = facade.Execute(query);
+            object? result = gateway.Execute(query);
             Assert.IsType<int>(result);
         }
         [Fact]
@@ -37,7 +112,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                  ('789 Oak St', 'Chicago', 'IL', '60601', 'USA');
                 """
             };
-            object? result = facade.Execute(query);
+            object? result = gateway.Execute(query);
             Assert.Equal(3, result);
         }
         [Fact]
@@ -51,7 +126,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 Where Id = 1 
                 """
             };
-            object? result = facade.Execute(query);
+            object? result = gateway.Execute(query);
             Assert.Equal(1, result);
         }
         [Fact]
@@ -64,7 +139,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 Set Country = 'United States Of America'
                 """
             };
-            object? result = facade.Execute(query);
+            object? result = gateway.Execute(query);
             Assert.Equal(2, result);
         }     
         [Fact]
@@ -90,7 +165,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 command.Parameters.Add(new SQLiteParameter("@postalCode", postalCode));
                 command.Parameters.Add(new SQLiteParameter("@country", country));
             };
-            object? result =  facade.Execute(query, Setup);
+            object? result =  gateway.Execute(query, Setup);
             Assert.IsType<int>(result);
         }
         [Fact]
@@ -116,9 +191,12 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 command.Parameters.Add(new SQLiteParameter("@postalCode", postalCode));
                 command.Parameters.Add(new SQLiteParameter("@country", country));
             };
-            object? result =  facade.Execute(query, Setup);
+            object? result =  gateway.Execute(query, Setup);
             Assert.Equal(1, result);
         }
+        #endregion
+
+        #region ExecuteUpdate
         [Fact]
         public void Execute_UpdateParameterizedSingleAddress_ReturnUpdateCount()
         {
@@ -133,11 +211,17 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
             var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SQLiteParameter("@addressId", 1));
             };
-            object? result =  facade.Execute(query, Setup);
+            object? result =  gateway.Execute(query, Setup);
             Assert.Equal(1, result);
         }
- 
+
         #endregion
-       
+
+        public void Dispose()
+        {
+            gateway.Execute(new DataDefinitionQuery() { Text = "DROP TABLE PhoneNumber" });
+            gateway.Execute(new DataDefinitionQuery() { Text = "DROP TABLE Address" });
+
+        }
     }
 }
