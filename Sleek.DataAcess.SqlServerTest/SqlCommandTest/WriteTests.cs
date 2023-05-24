@@ -2,7 +2,7 @@
 using System.Data.SqlClient;
 
 
-namespace Sleek.DataAcess.SqlServerTest.DbCommandTest
+namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
 {
     public class WriteTests : IClassFixture<SqlServerTestFixture>, IDisposable
     {

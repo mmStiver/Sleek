@@ -2,7 +2,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
 
-namespace Sleek.DataAcess.SqlServerTest
+namespace Sleek.DataAccess.SqlServerTest
 {
     public class SqlServerTestFixture : IDisposable
     {

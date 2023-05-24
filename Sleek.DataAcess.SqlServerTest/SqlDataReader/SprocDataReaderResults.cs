@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Data.SqlClient;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
+namespace Sleek.DataAccess.SqlServerTest.SqlDataReader
 {
     public class SprocsDataReaderResults : IClassFixture<SqlServerTestFixture>
     {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace Sleek.DataAcess.SqlServerTest
+namespace Sleek.DataAccess.SqlServerTest
 {
     internal static class TestData
     {

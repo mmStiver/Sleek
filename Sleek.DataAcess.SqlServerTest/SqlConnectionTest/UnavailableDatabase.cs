@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlConnectionTest
+namespace Sleek.DataAccess.SqlServerTest.SqlConnectionTest
 {
     public class UnavailableDatabase
     {

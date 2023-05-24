@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Data;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
+namespace Sleek.DataAccess.SqlServerTest.SqlDataReader
 {
     public class SelectDataReaderResults : IClassFixture<SqlServerTestFixture>
     {
