@@ -1,7 +1,8 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data.Common;
+using System.Data.SqlClient;
 
 
-namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
+namespace Sleek.DataAcess.SqlServerTest.DbCommandTest
 {
     public class WriteTests : IClassFixture<SqlServerTestFixture>, IDisposable
     {
@@ -101,7 +102,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 VALUES(@streetAddress, @city, @state, @postalCode, @country);
                 """
             };
-            var Setup = (SqlCommand command) => { 
+            var Setup = (DbCommand command) => { 
                 command.Parameters.Add(new SqlParameter("@streetAddress", address));
                 command.Parameters.Add(new SqlParameter("@city", city));
                 command.Parameters.Add(new SqlParameter("@state", state));
@@ -127,7 +128,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 VALUES(@streetAddress, @city, @state, @postalCode, @country);
                 """
             };
-            var Setup = (SqlCommand command) => {
+            var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@streetAddress", address));
                 command.Parameters.Add(new SqlParameter("@city", city));
                 command.Parameters.Add(new SqlParameter("@state", state));
@@ -148,7 +149,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 Where Id = @addressId 
                 """
             };
-            var Setup = (SqlCommand command) => {
+            var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@addressId", 1));
             };
             object? result = await facade.ExecuteAsync(query, Setup);
@@ -228,7 +229,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 VALUES(@streetAddress, @city, @state, @postalCode, @country);
                 """
             };
-            var Setup = (SqlCommand command) => {
+            var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@streetAddress", address));
                 command.Parameters.Add(new SqlParameter("@city", city));
                 command.Parameters.Add(new SqlParameter("@state", state));
@@ -254,7 +255,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 VALUES(@streetAddress, @city, @state, @postalCode, @country);
                 """
             };
-            var Setup = (SqlCommand command) => {
+            var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@streetAddress", address));
                 command.Parameters.Add(new SqlParameter("@city", city));
                 command.Parameters.Add(new SqlParameter("@state", state));
@@ -275,7 +276,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 Where Id = @addressId 
                 """
             };
-            var Setup = (SqlCommand command) => {
+            var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@addressId", 1));
             };
             object? result =  facade.Execute(query, Setup);

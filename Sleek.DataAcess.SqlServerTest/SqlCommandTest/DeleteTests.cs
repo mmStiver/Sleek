@@ -1,6 +1,7 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data.Common;
+using System.Data.SqlClient;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
+namespace Sleek.DataAcess.SqlServerTest.DbCommandTest
 {
     public class DeleteTests : IClassFixture<SqlServerTestFixture>, IDisposable
     {
@@ -64,7 +65,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 Where Id = 1 
                 """
             };
-            var Setup = (SqlCommand command) => {
+            var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@PhoneId", 1));
             };
             object? result = await facade.ExecuteAsync(query, Setup);
@@ -108,7 +109,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
                 Where Id = 1 
                 """
             };
-            var Setup = (SqlCommand command) => {
+            var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@PhoneId", 1));
             };
             object? result =  facade.Execute(query, Setup);

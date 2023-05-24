@@ -1,7 +1,8 @@
 ﻿
+using System.Data.Common;
 using System.Data.SqlClient;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
+namespace Sleek.DataAcess.SqlServerTest.DbCommandTest
 {
     public class SprocScalarResults : IClassFixture<SqlServerTestFixture> 
     {
@@ -24,7 +25,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         public async Task ExecuteAsync_ExecuteScalarFilterSalaryAndCountResults_ReturnsCountOfFoundRecords()
         {
             var proc = new StoredProcedure { Name = TestData.GetPersonProcedure.Name };
-            Action<SqlCommand>? setup = (Command) => {
+            Action<DbCommand>? setup = (Command) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
             object? result = await facade.ExecuteAsync(proc, setup);
@@ -98,7 +99,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         public void Execute_ExecuteScalarFilterSalaryAndCountResults_ReturnsCountOfFoundRecords()
         {
             var proc = new StoredProcedure { Name = TestData.GetPersonProcedure.Name };
-            Action<SqlCommand>? setup = (Command) => {
+            Action<DbCommand>? setup = (Command) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
             object? result = facade.Execute(proc, setup);
@@ -170,7 +171,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         public async Task ExecuteAsync_T_ExecuteScalarFilterSalaryAndCountResults_ReturnsCountOfFoundRecords()
         {
             var proc = new StoredProcedure { Name = TestData.GetPersonProcedure.Name };
-            Action<SqlCommand>? setup = (Command) => {
+            Action<DbCommand>? setup = (Command) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
             int result = await facade.ExecuteAsync<int>(proc, setup);
@@ -241,7 +242,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         public void Execute_T_ExecuteScalarFilterSalaryAndCountResults_ReturnsCountOfFoundRecords()
         {
             var proc = new StoredProcedure { Name = TestData.GetPersonProcedure.Name };
-            Action<SqlCommand>? setup = (Command) => {
+            Action<DbCommand>? setup = (Command) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
             int result = facade.Execute<int>(proc, setup);

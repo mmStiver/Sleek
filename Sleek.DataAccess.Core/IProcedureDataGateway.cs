@@ -19,9 +19,9 @@ namespace Sleek.DataAccess.Core
         /// Executes a stored procedure with custom command setup and returns the result as an object.
         /// </summary>
         /// <param name="procedure">The stored procedure to execute.</param>
-        /// <param name="Setup">An optional action to configure the SqlCommand before execution.</param>
+        /// <param name="Setup">An optional action to configure the DbCommand before execution.</param>
         /// <returns>An object representing the result of the query execution.</returns>
-        object? Execute(StoredProcedure procedure, Action<SqlCommand>? Setup);
+        object? Execute(StoredProcedure procedure, Action<DbCommand>? Setup);
 
         /// <summary>
         /// Executes a stored procedure and returns the result as an object of type TOutput.
@@ -36,9 +36,9 @@ namespace Sleek.DataAccess.Core
         /// </summary>
         /// <typeparam name="TOutput">The type of the result.</typeparam>
         /// <param name="procedure">The stored procedure to execute.</param>
-        /// <param name="Setup">An optional action to configure the SqlCommand before execution.</param>
+        /// <param name="Setup">An optional action to configure the DbCommand before execution.</param>
         /// <returns>An object of type TOutput representing the result of the query execution.</returns>
-        TOutput? Execute<TOutput>(StoredProcedure procedure, Action<SqlCommand>? Setup);
+        TOutput? Execute<TOutput>(StoredProcedure procedure, Action<DbCommand>? Setup);
 
         /// <summary>
         /// Executes a stored procedure and maps the result using the provided mapper function.
@@ -54,9 +54,9 @@ namespace Sleek.DataAccess.Core
         /// </summary>
         /// <typeparam name="TOutput">The type of the result.</typeparam>
         /// <param name="procedure">The stored procedure to execute.</param>
-        /// <param name="Setup">An optional action to configure the SqlCommand before execution.</param>
+        /// <param name="Setup">An optional action to configure the DbCommand before execution.</param>
         /// <param name="Mapper">A function to map the DbDataReader to the desired result type.</param>
         /// <returns>An object of type TOutput representing the result of the query execution.</returns>
-        TOutput? Execute<TOutput>(StoredProcedure procedure, Action<SqlCommand>? Setup, Func<DbDataReader, TOutput> Mapper);
+        TOutput? Execute<TOutput>(StoredProcedure procedure, Action<DbCommand>? Setup, Func<DbDataReader, TOutput> Mapper);
     }
 }

@@ -25,7 +25,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Setup">An action to perform additional configuration on the SQL command, or null if no additional configuration is needed.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the first column of the first row in the result set, or a default value if the result set is empty or the result is of type <see cref="DBNull"/>.</returns>
-        public async Task<object?> ExecuteAsync(Select query, Action<SqlCommand>? Setup = null, CancellationToken cancellationToken = default)
+        public async Task<object?> ExecuteAsync(Select query, Action<DbCommand>? Setup = null, CancellationToken cancellationToken = default)
             => await GetSingle<object?>(query.Text, CommandType.Text, Setup, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Setup">An action to perform additional configuration on the SQL command, or null if no additional configuration is needed.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the first column of the first row in the result set, or a default value if the result set is empty or the result is of type <see cref="DBNull"/>.</returns>
-        public async Task<object?> ExecuteAsync(Select query, object input, Action<SqlCommand, object>? Setup, CancellationToken cancellationToken = default)
+        public async Task<object?> ExecuteAsync(Select query, object input, Action<DbCommand, object>? Setup, CancellationToken cancellationToken = default)
             => await GetSingle<object, object?>(query.Text, CommandType.Text, input, Setup, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the first row of the result set, or default if the result set is empty.</returns>
         public async Task<TOutput?> ExecuteAsync<TOutput>(Select query, CancellationToken cancellationToken = default)
-            => await ExecuteAsync<TOutput>(query, (Action<SqlCommand>?)null, cancellationToken).ConfigureAwait(false);
+            => await ExecuteAsync<TOutput>(query, (Action<DbCommand>?)null, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Executes a SQL SELECT command asynchronously using a setup action and maps the first row of the result to a specified type.
@@ -57,7 +57,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Setup">An action to setup the SQL command.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the first row of the result set, or default if the result set is empty.</returns>
-        public async Task<TOutput?> ExecuteAsync<TOutput>(Select query, Action<SqlCommand>? Setup, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TOutput>(Select query, Action<DbCommand>? Setup, CancellationToken cancellationToken = default)
              => await GetSingle<TOutput>(query.Text, CommandType.Text, Setup, cancellationToken).ConfigureAwait(false);
 
         //query + reader
@@ -93,7 +93,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Setup">An action to perform additional configuration on the SQL command, or null if no additional configuration is needed.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the first column of the first row in the result set, or a default value if the result set is empty or the result is of type <see cref="DBNull"/>.</returns>
-        public async Task<TOutput?> ExecuteAsync<TInput, TOutput>(Select Query, TInput input, Action<SqlCommand, TInput>? Setup, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TInput, TOutput>(Select Query, TInput input, Action<DbCommand, TInput>? Setup, CancellationToken cancellationToken = default)
             => await GetSingle<TInput, TOutput?>(Query.Text, CommandType.Text, input, Setup, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Mapper">A function to map the result set to an instance of TOutput.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the mapped result set.</returns>
-        public async Task<TOutput?> ExecuteAsync<TOutput>(Select Query, Action<SqlCommand>? Setup, Func<DbDataReader, TOutput>? Mapper, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TOutput>(Select Query, Action<DbCommand>? Setup, Func<DbDataReader, TOutput>? Mapper, CancellationToken cancellationToken = default)
             => await GetReader<TOutput>(Query.Text, CommandType.Text, Setup, Mapper, cancellationToken);
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Mapper">An asynchronous function to map the result set to an instance of TOutput.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the mapped result set.</returns>
-        public async Task<TOutput?> ExecuteAsync<TOutput>(Select Query, Action<SqlCommand>? Setup, Func<DbDataReader, Task<TOutput>> Mapper, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TOutput>(Select Query, Action<DbCommand>? Setup, Func<DbDataReader, Task<TOutput>> Mapper, CancellationToken cancellationToken = default)
             => await GetReader<TOutput>(Query.Text, CommandType.Text, Setup, Mapper, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Mapper">A function to map the data reader result to a custom object.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the custom object mapped from the data reader result.</returns>
-        public async Task<TOutput?> ExecuteAsync<TInput, TOutput>(Select Query, TInput input, Action<SqlCommand, TInput>? Setup, Func<DbDataReader, TOutput> Mapper, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TInput, TOutput>(Select Query, TInput input, Action<DbCommand, TInput>? Setup, Func<DbDataReader, TOutput> Mapper, CancellationToken cancellationToken = default)
             => await GetReader<TInput, TOutput>(Query.Text, CommandType.Text, input, Setup, Mapper, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Mapper">An asynchronous function to map the result set to an instance of TOutput.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the custom object mapped from the data reader result.</returns>
-        public async Task<TOutput?> ExecuteAsync<TInput, TOutput>(Select Query, TInput input, Action<SqlCommand, TInput>? Setup, Func<DbDataReader, Task<TOutput>> Mapper, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TInput, TOutput>(Select Query, TInput input, Action<DbCommand, TInput>? Setup, Func<DbDataReader, Task<TOutput>> Mapper, CancellationToken cancellationToken = default)
                 => await GetReader<TInput, TOutput>(Query.Text, CommandType.Text, input, Setup, Mapper, cancellationToken).ConfigureAwait(false);
 
 
@@ -166,7 +166,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Setup">An action to setup the SQL command.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the first column of the first row in the result set returned by the query.</returns>
-        public async Task<object?> ExecuteAsync(StoredProcedure procedure, Action<SqlCommand>? Setup, CancellationToken cancellationToken)
+        public async Task<object?> ExecuteAsync(StoredProcedure procedure, Action<DbCommand>? Setup, CancellationToken cancellationToken)
             => await GetSingle<object>(procedure.Name, CommandType.StoredProcedure, Setup, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the first column of the first row in the result set returned by the query, converted to type TOutput.</returns>
 
-        public async Task<TOutput?> ExecuteAsync<TOutput>(StoredProcedure procedure, Action<SqlCommand>? Setup, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TOutput>(StoredProcedure procedure, Action<DbCommand>? Setup, CancellationToken cancellationToken = default)
              => await GetSingle<TOutput>(procedure.Name, CommandType.StoredProcedure, Setup, cancellationToken).ConfigureAwait(false);
 
         //sproc reader
@@ -211,7 +211,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Mapper">A function to map the data reader to the type TOutput.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the result of the mapper function.</returns>
-        public async Task<TOutput?> ExecuteAsync<TOutput>(StoredProcedure procedure, Action<SqlCommand>? Setup, Func<DbDataReader, TOutput> Mapper, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TOutput>(StoredProcedure procedure, Action<DbCommand>? Setup, Func<DbDataReader, TOutput> Mapper, CancellationToken cancellationToken = default)
             => await GetReader<TOutput>(procedure.Name, CommandType.StoredProcedure, Setup, Mapper, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Mapper">A function to map the data reader to the type TOutput. This function can run asynchronously.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. he task result is the result of the mapper function.</returns>
-        public async Task<TOutput?> ExecuteAsync<TOutput>(StoredProcedure Query, Action<SqlCommand>? Setup, Func<DbDataReader, Task<TOutput>> Mapper, CancellationToken cancellationToken = default)
+        public async Task<TOutput?> ExecuteAsync<TOutput>(StoredProcedure Query, Action<DbCommand>? Setup, Func<DbDataReader, Task<TOutput>> Mapper, CancellationToken cancellationToken = default)
             => await GetReader(Query.Name, CommandType.StoredProcedure, Setup, Mapper, cancellationToken).ConfigureAwait(false);
 
         //NonQuery
@@ -254,7 +254,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Setup">An action to perform additional configuration on the SQL command, or null if no additional configuration is needed.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the number of rows affected.</returns>
-        public async Task<int> ExecuteAsync(Write Query, Action<SqlCommand>? Setup, CancellationToken cancellationToken = default)
+        public async Task<int> ExecuteAsync(Write Query, Action<DbCommand>? Setup, CancellationToken cancellationToken = default)
             => await Post(Query.Text, CommandType.Text, Setup, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
@@ -272,18 +272,18 @@ namespace Sleek.DataAccess.SqlServer
         /// </summary>
         /// <param name="text">The SQL command text or stored procedure name to be executed.</param>
         /// <param name="commandType">Specifies how the command text is interpreted, either as a Text command or as a StoredProcedure.</param>
-        /// <param name="Setup">An optional action to perform additional setup for the SqlCommand.</param>
+        /// <param name="Setup">An optional action to perform additional setup for the DbCommand.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the number of rows affected.</returns>
         private async Task<int> Post(string text,
            CommandType commandType,
-           Action<SqlCommand>? Setup,
+           Action<DbCommand>? Setup,
            CancellationToken cancellationToken)
         {
             SqlConnection connection = new SqlConnection(connectionConfiguration);
             await using (connection.ConfigureAwait(false))
             {
-                SqlCommand command = new SqlCommand(text, connection);
+                DbCommand command = new SqlCommand(text, connection);
                 await using (command.ConfigureAwait(false))
                 {
                     if (Setup != null)
@@ -297,13 +297,13 @@ namespace Sleek.DataAccess.SqlServer
 
         private async Task<TOutput?> GetSingle<TOutput>(string text,
             CommandType commandType,
-            Action<SqlCommand>? Setup,
+            Action<DbCommand>? Setup,
             CancellationToken cancellationToken)
         {
             SqlConnection connection = new SqlConnection(connectionConfiguration);
             await using (connection.ConfigureAwait(false))
             {
-                SqlCommand command = new SqlCommand(text, connection);
+                DbCommand command = new SqlCommand(text, connection);
                 await using (command.ConfigureAwait(false))
                 {
                     if (Setup != null)
@@ -334,13 +334,13 @@ namespace Sleek.DataAccess.SqlServer
         private async Task<TOutput?> GetSingle<TInput, TOutput>(string text,
            CommandType commandType,
            TInput input,
-           Action<SqlCommand, TInput>? Setup,
+           Action<DbCommand, TInput>? Setup,
            CancellationToken cancellationToken)
         {
             SqlConnection connection = new SqlConnection(connectionConfiguration);
             await using (connection.ConfigureAwait(false))
             {
-                SqlCommand command = new SqlCommand(text, connection);
+                DbCommand command = new SqlCommand(text, connection);
                 await using (command.ConfigureAwait(false))
                 {
                     if (Setup != null)
@@ -364,22 +364,22 @@ namespace Sleek.DataAccess.SqlServer
         /// <typeparam name="TOutput">The type of the output object.</typeparam>
         /// <param name="text">The SQL command text or stored procedure name to be executed.</param>
         /// <param name="commandType">Specifies how the command text is interpreted, either as a Text command or as a StoredProcedure.</param>
-        /// <param name="input">The input parameter to be used in the SqlCommand setup.</param>
-        /// <param name="Setup">An optional action to perform additional setup for the SqlCommand with the input parameter.</param>
+        /// <param name="input">The input parameter to be used in the DbCommand setup.</param>
+        /// <param name="Setup">An optional action to perform additional setup for the DbCommand with the input parameter.</param>
         /// <param name="Mapper">A function to map the DbDataReader result set to the output object.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the output object or null if the result set is empty.</returns>
         private async Task<TOutput?> GetReader<TInput, TOutput>(string text,
              CommandType commandType,
              TInput input,
-              Action<SqlCommand, TInput>? Setup,
+              Action<DbCommand, TInput>? Setup,
              Func<DbDataReader, TOutput> Mapper,
              CancellationToken cancellationToken)
         {
             SqlConnection connection = new SqlConnection(connectionConfiguration);
             await using (connection.ConfigureAwait(false))
             {
-                SqlCommand command = new SqlCommand(text, connection);
+                DbCommand command = new SqlCommand(text, connection);
                 await using (command.ConfigureAwait(false))
                 {
                     if (Setup != null)
@@ -395,14 +395,14 @@ namespace Sleek.DataAccess.SqlServer
         }
         private async Task<TOutput?> GetReader<TOutput>(string text,
             CommandType commandType,
-             Action<SqlCommand>? Setup,
+             Action<DbCommand>? Setup,
             Func<DbDataReader, TOutput> Mapper,
             CancellationToken cancellationToken)
         {
             SqlConnection connection = new SqlConnection(connectionConfiguration);
             await using (connection.ConfigureAwait(false))
             {
-                SqlCommand command = new SqlCommand(text, connection);
+                DbCommand command = new SqlCommand(text, connection);
                 await using (command.ConfigureAwait(false))
                 {
                     if (Setup != null)
@@ -418,14 +418,14 @@ namespace Sleek.DataAccess.SqlServer
         }
         private async Task<TOutput?> GetReader<TOutput>(string text,
             CommandType commandType,
-             Action<SqlCommand>? Setup,
+             Action<DbCommand>? Setup,
             Func<DbDataReader, Task<TOutput>> Mapper,
             CancellationToken cancellationToken)
         {
             SqlConnection connection = new SqlConnection(connectionConfiguration);
             await using (connection.ConfigureAwait(false))
             {
-                SqlCommand command = new SqlCommand(text, connection);
+                DbCommand command = new SqlCommand(text, connection);
                 await using (command.ConfigureAwait(false))
                 {
                     if (Setup != null)
@@ -443,14 +443,14 @@ namespace Sleek.DataAccess.SqlServer
         private async Task<TOutput?> GetReader<TInput, TOutput>(string text,
              CommandType commandType,
              TInput input,
-              Action<SqlCommand, TInput>? Setup,
+              Action<DbCommand, TInput>? Setup,
              Func<DbDataReader, Task<TOutput>> Mapper,
              CancellationToken cancellationToken)
         {
             SqlConnection connection = new SqlConnection(connectionConfiguration);
             await using (connection.ConfigureAwait(false))
             {
-                SqlCommand command = new SqlCommand(text, connection);
+                DbCommand command = new SqlCommand(text, connection);
                 await using (command.ConfigureAwait(false))
                 {
                     if (Setup != null)
