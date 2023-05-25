@@ -1,10 +1,12 @@
-﻿using System.Data;
+﻿using Sleek.DataAcess.SqlServerTest;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace Sleek.DataAccess.SqlServerTest.SqlDataReader
 {
-    public class SprocsDataReaderResults : IClassFixture<SqlServerTestFixture>
+    [Collection("SQL Server Database collection")]
+    public class SprocsDataReaderResults 
     {
 
         ISqlServerGateway facade;

@@ -2,8 +2,7 @@
 
 namespace Sleek.DataAcess.SQLiteTest.CommandTest
 {
-    [Collection("SQLite Database collection")]
-    public class SelectScalarResults  
+    public class SelectScalarResults : IClassFixture<SQLiteTestFixture>
     {
 
         ISQLiteGateway facade;

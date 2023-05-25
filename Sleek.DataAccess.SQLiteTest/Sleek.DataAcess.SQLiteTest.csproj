@@ -28,8 +28,4 @@
     <ProjectReference Include="..\Sleek.DataAccess.SQLite\Sleek.DataAccess.SQLite.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DataReaderTest\" />
-  </ItemGroup>
-
 </Project>

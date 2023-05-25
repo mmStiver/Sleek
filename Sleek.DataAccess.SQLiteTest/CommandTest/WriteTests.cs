@@ -3,8 +3,7 @@ using System.Data.Common;
 
 namespace Sleek.DataAcess.SQLiteTest.CommandTest
 {
-    [Collection("SQLite Database collection")]
-    public class WriteTests : IDisposable
+    public class WriteTests : IClassFixture<SQLiteTestFixture>, IDisposable
     {
 
         ISQLiteGateway gateway;

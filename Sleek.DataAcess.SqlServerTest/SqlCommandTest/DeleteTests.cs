@@ -3,7 +3,8 @@ using System.Data.SqlClient;
 
 namespace Sleek.DataAcess.SqlServerTest.DbCommandTest
 {
-    public class DeleteTests : IClassFixture<SqlServerTestFixture>, IDisposable
+    [Collection("SQL Server Database collection")]
+    public class DeleteTests : IDisposable
     {
 
         ISqlServerGateway facade;

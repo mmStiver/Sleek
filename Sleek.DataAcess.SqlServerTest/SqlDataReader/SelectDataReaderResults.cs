@@ -10,10 +10,12 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Globalization;
 using System.Data;
+using Sleek.DataAcess.SqlServerTest;
 
 namespace Sleek.DataAccess.SqlServerTest.SqlDataReader
 {
-    public class SelectDataReaderResults : IClassFixture<SqlServerTestFixture>
+    [Collection("SQL Server Database collection")]
+    public class SelectDataReaderResults 
     {
 
         ISqlServerGateway facade;

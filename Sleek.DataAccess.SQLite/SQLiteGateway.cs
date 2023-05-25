@@ -65,10 +65,10 @@ namespace Sleek.DataAccess.SQLite
             => Execute<TOutput>(Query, null, Mapper);
 
         public TOutput? Execute<TOutput>(Select Query, Action<DbCommand>? Setup, Func<DbDataReader, TOutput> Mapper)
-            => Execute<TOutput>(Query, Setup, Mapper);
+            => GetReader<TOutput>(Query.Text, Setup, Mapper);
 
         public TOutput? Execute<TInput, TOutput>(Select Query, TInput Input, Action<DbCommand, TInput>? Setup, Func<DbDataReader, TOutput> Mapper)
-            => GetReader(Query.Text, Input, null, Mapper);
+            => GetReader(Query.Text, Input, Setup, Mapper);
 
 
         public int Execute(Write Query)
@@ -218,7 +218,6 @@ namespace Sleek.DataAccess.SQLite
         /// <typeparam name="TInput">The type of the input object.</typeparam>
         /// <typeparam name="TOutput">The type of the output object.</typeparam>
         /// <param name="text">The command text.</param>
-        /// <param name="commandType">The type of the command (Text, StoredProcedure).</param>
         /// <param name="input">The input object.</param>
         /// <param name="Setup">An optional action to perform additional setup for the DbCommand.</param>
         /// <param name="Mapper">A function to map the DbDataReader result set to the output object.</param>

@@ -3,7 +3,9 @@ using System.Data.SqlClient;
 
 namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
 {
-    public class SelectScalarResults : IClassFixture<SqlServerTestFixture> 
+    [Collection("SQL Server Database collection")]
+
+    public class SelectScalarResults
     {
 
         ISqlServerGateway facade;

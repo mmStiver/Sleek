@@ -4,7 +4,8 @@ using System.Data.SqlClient;
 
 namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
 {
-    public class SprocScalarResults : IClassFixture<SqlServerTestFixture> 
+    [Collection("SQL Server Database collection")]
+    public class SprocScalarResults
     {
 
         ISqlServerGateway facade;

@@ -1,6 +1,7 @@
 ﻿namespace Sleek.DataAccess.SqlServerTest.SqlConnectionTest
 {
-    public class AvailableDatabase : IClassFixture<SqlServerTestFixture>
+    [Collection("SQL Server Database collection")]
+    public class AvailableDatabase
     {
         ISqlServerGateway gateway;
         public AvailableDatabase(SqlServerTestFixture context)
