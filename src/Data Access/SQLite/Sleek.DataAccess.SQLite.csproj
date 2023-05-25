@@ -11,6 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sleek.DataAccess.Core\Sleek.DataAccess.Core.csproj" />
+    <ProjectReference Include="..\Core\Sleek.DataAccess.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -10,8 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SqlCommandTest\IllegalCommand.cs" />
+    <Compile Remove="SqlDataReader\ReaderNotAvailable.cs" />
+    <Compile Remove="SqlDataReader\ValidReader.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-    <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -24,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sleek.DataAccess.Core\Sleek.DataAccess.Core.csproj" />
-    <ProjectReference Include="..\Sleek.DataAccess.SQLite\Sleek.DataAccess.SQLite.csproj" />
+    <ProjectReference Include="..\..\..\src\Data Access\Core\Sleek.DataAccess.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\Data Access\SqlServer\Sleek.DataAccess.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>

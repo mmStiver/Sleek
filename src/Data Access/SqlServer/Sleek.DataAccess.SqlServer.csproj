@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sleek.DataAccess.Core\Sleek.DataAccess.Core.csproj" />
+    <ProjectReference Include="..\Core\Sleek.DataAccess.Core.csproj" />
   </ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 

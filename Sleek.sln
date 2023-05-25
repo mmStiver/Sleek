@@ -5,15 +5,15 @@ VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A56C6012-41BF-42CB-8FE6-AB5B3A1428BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAcess.SqlServerTest", "Tests\Sleek.DataAcess.SqlServerTest\Sleek.DataAcess.SqlServerTest.csproj", "{CA745630-C9EB-4B81-BFC1-D86C19936B72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAcess.SQLiteTest", "Tests\DataAccess\SQLiteTest\Sleek.DataAcess.SQLiteTest.csproj", "{4C351ED0-A4D0-4C8A-B22C-A960DCEA90FC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAccess.Core", "src\Sleek.DataAccess.Core\Sleek.DataAccess.Core.csproj", "{49D9B800-B947-4CA6-B288-FE54F9794A10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAcess.SqlServerTest", "Tests\DataAccess\SqlServerTest\Sleek.DataAcess.SqlServerTest.csproj", "{D942E59D-0DAF-47C7-899D-4EB0F39A1611}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAccess.SqlServer", "src\Sleek.DataAccess.SqlServer\Sleek.DataAccess.SqlServer.csproj", "{05851232-7D6D-4960-BA72-FE7C13CE15D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAccess.Core", "src\Data Access\Core\Sleek.DataAccess.Core.csproj", "{EAE6D83C-0B08-4717-A412-E8DDE14850A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sleek.DataAccess.SQLite", "Sleek.DataAccess.SQLite\Sleek.DataAccess.SQLite.csproj", "{5EB022C8-BF8A-4CE1-A0C8-9EFCAE114853}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAccess.SQLite", "src\Data Access\SQLite\Sleek.DataAccess.SQLite.csproj", "{EBBCD6DF-00AC-4CAA-A8EA-B374AB78BABB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAcess.SQLiteTest", "Sleek.DataAccess.SQLiteTest\Sleek.DataAcess.SQLiteTest.csproj", "{AC6D5ECD-9FB3-42C2-88DD-99CCCE8E4A88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sleek.DataAccess.SqlServer", "src\Data Access\SqlServer\Sleek.DataAccess.SqlServer.csproj", "{7F759E91-087E-4926-B116-7EC6433E6508}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,33 +21,33 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{610E16E2-EE8D-4A87-BE68-E7ACB302C03E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{610E16E2-EE8D-4A87-BE68-E7ACB302C03E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{610E16E2-EE8D-4A87-BE68-E7ACB302C03E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{610E16E2-EE8D-4A87-BE68-E7ACB302C03E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D44916A7-C03E-4AFA-AE30-F03AB092D602}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D44916A7-C03E-4AFA-AE30-F03AB092D602}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D44916A7-C03E-4AFA-AE30-F03AB092D602}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D44916A7-C03E-4AFA-AE30-F03AB092D602}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7FFC891C-B988-48C1-B9C1-9B7734634E0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FFC891C-B988-48C1-B9C1-9B7734634E0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FFC891C-B988-48C1-B9C1-9B7734634E0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FFC891C-B988-48C1-B9C1-9B7734634E0E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5EB022C8-BF8A-4CE1-A0C8-9EFCAE114853}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5EB022C8-BF8A-4CE1-A0C8-9EFCAE114853}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5EB022C8-BF8A-4CE1-A0C8-9EFCAE114853}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5EB022C8-BF8A-4CE1-A0C8-9EFCAE114853}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AC6D5ECD-9FB3-42C2-88DD-99CCCE8E4A88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AC6D5ECD-9FB3-42C2-88DD-99CCCE8E4A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AC6D5ECD-9FB3-42C2-88DD-99CCCE8E4A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AC6D5ECD-9FB3-42C2-88DD-99CCCE8E4A88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C351ED0-A4D0-4C8A-B22C-A960DCEA90FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C351ED0-A4D0-4C8A-B22C-A960DCEA90FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C351ED0-A4D0-4C8A-B22C-A960DCEA90FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C351ED0-A4D0-4C8A-B22C-A960DCEA90FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D942E59D-0DAF-47C7-899D-4EB0F39A1611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D942E59D-0DAF-47C7-899D-4EB0F39A1611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D942E59D-0DAF-47C7-899D-4EB0F39A1611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D942E59D-0DAF-47C7-899D-4EB0F39A1611}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAE6D83C-0B08-4717-A412-E8DDE14850A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAE6D83C-0B08-4717-A412-E8DDE14850A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAE6D83C-0B08-4717-A412-E8DDE14850A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAE6D83C-0B08-4717-A412-E8DDE14850A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBBCD6DF-00AC-4CAA-A8EA-B374AB78BABB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBBCD6DF-00AC-4CAA-A8EA-B374AB78BABB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBBCD6DF-00AC-4CAA-A8EA-B374AB78BABB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBBCD6DF-00AC-4CAA-A8EA-B374AB78BABB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F759E91-087E-4926-B116-7EC6433E6508}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F759E91-087E-4926-B116-7EC6433E6508}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F759E91-087E-4926-B116-7EC6433E6508}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F759E91-087E-4926-B116-7EC6433E6508}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{610E16E2-EE8D-4A87-BE68-E7ACB302C03E} = {A56C6012-41BF-42CB-8FE6-AB5B3A1428BD}
-		{AC6D5ECD-9FB3-42C2-88DD-99CCCE8E4A88} = {A56C6012-41BF-42CB-8FE6-AB5B3A1428BD}
+		{4C351ED0-A4D0-4C8A-B22C-A960DCEA90FC} = {A56C6012-41BF-42CB-8FE6-AB5B3A1428BD}
+		{D942E59D-0DAF-47C7-899D-4EB0F39A1611} = {A56C6012-41BF-42CB-8FE6-AB5B3A1428BD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9A512335-CE20-427C-A7CA-88AB7ADDABEC}
