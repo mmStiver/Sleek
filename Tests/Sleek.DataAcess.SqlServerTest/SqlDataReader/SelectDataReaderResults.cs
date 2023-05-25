@@ -10,10 +10,12 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Globalization;
 using System.Data;
+using Sleek.DataAcess.SqlServerTest;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
+namespace Sleek.DataAccess.SqlServerTest.SqlDataReader
 {
-    public class SelectDataReaderResults : IClassFixture<SqlServerTestFixture>
+    [Collection("SQL Server Database collection")]
+    public class SelectDataReaderResults 
     {
 
         ISqlServerGateway facade;
@@ -229,7 +231,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public async Task ExecuteAsync_T_ExecuteReaderFilterSalaryAndCountResults_ReturnsMappedObjects()
         {
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -270,7 +272,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public async Task ExecuteAsync_T_ExecuteReaderLoadedIntoDataTable_ReturnsDataTableWithColumnValues()
         {
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -419,7 +421,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public async Task ExecuteAsync_T_ExecuteReaderFilterSalaryAndCountResults_ReturnsMappedObjectsAsyncronously()
         {
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -590,7 +592,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public void Execute_T_ExecuteReaderFilterSalaryAndCountResults_ReturnsMappedObjects()
         {
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -631,7 +633,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public void ExecuteAsync_ExecuteReaderLoadedIntoDataTable_ReturnsDataTableWithColumnValues()
         {
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -654,7 +656,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         {
             int personId = 3;
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Id >= @personId;" };
-            Action<SqlCommand, int>? setup = (Command, personId) =>
+            Action<DbCommand, int>? setup = (Command, personId) =>
             {
                 Command.Parameters.Add(new SqlParameter("@personId", personId));
             };
@@ -672,7 +674,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         {
             Decimal salary = 62000;
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand, Decimal>? setup = (Command, minSalary) =>
+            Action<DbCommand, Decimal>? setup = (Command, minSalary) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", minSalary));
             };
@@ -689,7 +691,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         {
             Decimal salary = 62000;
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand, Decimal>? setup = (Command, minSalary) =>
+            Action<DbCommand, Decimal>? setup = (Command, minSalary) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", minSalary));
             };
@@ -702,7 +704,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         {
             Decimal salary = 62000;
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand, Decimal>? setup = (Command, minSalary) =>
+            Action<DbCommand, Decimal>? setup = (Command, minSalary) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", minSalary));
             };
@@ -718,7 +720,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         {
             int personId = 3;
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Id >= @personId;" };
-            Action<SqlCommand, int>? setup = (Command, id) =>
+            Action<DbCommand, int>? setup = (Command, id) =>
             {
                 Command.Parameters.Add(new SqlParameter("@personId", (int)id));
             };
@@ -736,7 +738,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         {
             Decimal salary = 62000;
             var query = new Select() { Text = $"SELECT * FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand, Decimal>? setup = (Command, minSalary) =>
+            Action<DbCommand, Decimal>? setup = (Command, minSalary) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", minSalary));
             };
@@ -753,7 +755,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         {
             Decimal salary = 62000;
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand, Decimal>? setup = (Command, minSalary) =>
+            Action<DbCommand, Decimal>? setup = (Command, minSalary) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", minSalary));
             };

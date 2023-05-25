@@ -1,8 +1,11 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data.Common;
+using System.Data.SqlClient;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
+namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
 {
-    public class SelectScalarResults : IClassFixture<SqlServerTestFixture> 
+    [Collection("SQL Server Database collection")]
+
+    public class SelectScalarResults
     {
 
         ISqlServerGateway facade;
@@ -23,7 +26,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         public async Task ExecuteAsync_ExecuteScalarFilterSalaryAndCountResults_ReturnsCountOfFoundRecords()
         {
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) => {
+            Action<DbCommand>? setup = (Command) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
             object? result = await facade.ExecuteAsync(query, setup);
@@ -34,7 +37,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         {
             Decimal salary = 62000;
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand, object>? setup = (Command, minSalary) => {
+            Action<DbCommand, object>? setup = (Command, minSalary) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", (Decimal)minSalary));
             };
             object? result = await facade.ExecuteAsync(query, salary, setup);
@@ -239,7 +242,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         public void Execute_ExecuteScalarFilterSalaryAndCountResults_ReturnsCountOfFoundRecords()
         {
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) => {
+            Action<DbCommand>? setup = (Command) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
             object? result = facade.Execute(query, setup);
@@ -251,7 +254,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         {
             Decimal salary = 62000;
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand, object>? setup = (Command, minSalary) => {
+            Action<DbCommand, object>? setup = (Command, minSalary) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", (Decimal)minSalary));
             };
             object? result = facade.Execute(query, salary, setup);
@@ -456,7 +459,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         public async Task ExecuteAsync_T_ExecuteScalarFilterSalaryAndCountResults_ReturnsCountOfFoundRecords()
         {
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) => {
+            Action<DbCommand>? setup = (Command) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
             object? result = await facade.ExecuteAsync<int>(query, setup);
@@ -661,7 +664,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         public void Execute_T_ExecuteScalarFilterSalaryAndCountResults_ReturnsCountOfFoundRecords()
         {
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
-            Action<SqlCommand>? setup = (Command) => {
+            Action<DbCommand>? setup = (Command) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
             object? result = facade.Execute<int>(query, setup);
@@ -861,7 +864,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
             Decimal minSalary = 62000;
 
-            Action<SqlCommand, Decimal>? setup = (Command, salary ) => {
+            Action<DbCommand, Decimal>? setup = (Command, salary ) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", salary));
             };
             int? result = await facade.ExecuteAsync<Decimal, int>(query, minSalary, setup);
@@ -876,7 +879,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlCommandTest
         {
             var query = new Select() { Text = $"SELECT COUNT(*) FROM {TestData.TestTableName} WHERE Salary >= @minSalary;" };
             Decimal minSalary = 62000;
-            Action<SqlCommand, Decimal>? setup = (Command, salary) => {
+            Action<DbCommand, Decimal>? setup = (Command, salary) => {
                 Command.Parameters.Add(new SqlParameter("@minSalary", salary));
             };
             int? result = facade.Execute<Decimal, int>(query, minSalary, setup);

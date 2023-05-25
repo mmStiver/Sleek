@@ -1,10 +1,12 @@
-﻿using System.Data;
+﻿using Sleek.DataAcess.SqlServerTest;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 
-namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
+namespace Sleek.DataAccess.SqlServerTest.SqlDataReader
 {
-    public class SprocsDataReaderResults : IClassFixture<SqlServerTestFixture>
+    [Collection("SQL Server Database collection")]
+    public class SprocsDataReaderResults 
     {
 
         ISqlServerGateway facade;
@@ -166,7 +168,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public async Task ExecuteAsync_T_ExecuteReaderFilterSalaryAndCountResults_ReturnsMappedObjects()
         {
             var proc = new StoredProcedure() { Name = "GetPerson" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -207,7 +209,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public async Task ExecuteAsync_T_ExecuteReaderLoadedIntoDataTable_ReturnsDataTableWithColumnValues()
         {
             var proc = new StoredProcedure() { Name = "GetPerson" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -355,7 +357,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public async Task ExecuteAsync_T_ExecuteReaderFilterSalaryAndCountResults_ReturnsMappedObjectsAsyncronously()
         {
             var proc = new StoredProcedure() { Name = "GetPerson" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -526,7 +528,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public void Execute_T_ExecuteReaderFilterSalaryAndCountResults_ReturnsMappedObjects()
         {
             var proc = new StoredProcedure() { Name = "GetPerson" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };
@@ -567,7 +569,7 @@ namespace Sleek.DataAcess.SqlServerTest.SqlDataReader
         public void ExecuteAsync_ExecuteReaderLoadedIntoDataTable_ReturnsDataTableWithColumnValues()
         {
             var proc = new StoredProcedure() { Name = "GetPerson" };
-            Action<SqlCommand>? setup = (Command) =>
+            Action<DbCommand>? setup = (Command) =>
             {
                 Command.Parameters.Add(new SqlParameter("@minSalary", 62000));
             };

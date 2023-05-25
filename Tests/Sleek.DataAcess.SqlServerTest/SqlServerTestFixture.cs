@@ -2,7 +2,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
 
-namespace Sleek.DataAcess.SqlServerTest
+namespace Sleek.DataAccess.SqlServerTest
 {
     public class SqlServerTestFixture : IDisposable
     {
@@ -179,5 +179,13 @@ namespace Sleek.DataAcess.SqlServerTest
             //     }
             // }
         }
+    }
+    
+    [CollectionDefinition("SQL Server Database collection")]
+    public class SqlServerCollection : ICollectionFixture<SqlServerTestFixture>
+    {
+        // This class has no code, and is never created. Its purpose is simply
+        // to be the place to apply [CollectionDefinition] and all the
+        // ICollectionFixture<> interfaces.
     }
 }
