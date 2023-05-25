@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	  <PackageId>Sleek.DataAccess.Core</PackageId>
-	  <Version>1.0.5</Version>
+	  <Version>1.1.0</Version>
 	  <Authors>Michael Stiver-Balla</Authors>
 	  <Product>Sleek DataAccess Library</Product>
 	  <Description>A sleek and modern data access library for all your needs.</Description>
