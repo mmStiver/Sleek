@@ -16,6 +16,8 @@
 	  <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <RepositoryUrl>https://github.com/mmStiver/Sleek</RepositoryUrl>
+
   </PropertyGroup>
 
   <ItemGroup>
