@@ -172,7 +172,28 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Setup">An action to setup the SQL command.</param>
         /// <returns>The number of rows affected by the query.</returns>
         public int Execute(Write Query, Action<DbCommand>? Setup)
-           => Post(Query.Text, CommandType.Text, Setup);
+           => Post<object>(Query.Text, CommandType.Text, null,  Setup, null);
+
+        /// <summary>
+        /// Executes a write query with a specific setup action and returns the number of rows affected.
+        /// </summary>
+        /// <param name="input">The input object.</param>
+        /// <param name="Query">An instance of the Write class representing the query to execute.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>The number of rows affected by the query.</returns>
+        public int Execute(Write Query, object Input, Action<DbCommand, object>? Setup)
+        => Post<object>(Query.Text, CommandType.Text, Input, null, Setup);
+
+        /// <summary
+        /// Executes a write query with a specific setup action and returns the number of rows affected.
+        /// </summary>
+        /// <typeparam name="TInput">The type of the input object.</typeparam>
+        /// <param name="input">The input object.</param>
+        /// <param name="Query">An instance of the Write class representing the query to execute.</param>
+        /// <param name="Setup">An action to setup the SQL command.</param>
+        /// <returns>The number of rows affected by the query.</returns>
+        public int Execute<TInput>(Write Query, TInput Input, Action<DbCommand, TInput>? Setup)
+        => Post<TInput>(Query.Text, CommandType.Text, Input, null, Setup);
 
         /// <summary>
         /// Executes a DataDefinitionQuery and returns the number of rows affected.
@@ -199,13 +220,19 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="commandType">The type of the command (Text, StoredProcedure).</param>
         /// <param name="Setup">An optional action to perform additional setup for the DbCommand.</param>
         /// <returns>The number of rows affected.</returns>
-        private int Post(string text, CommandType commandType, Action<DbCommand>? Setup)
+        private int Post<TInput>(string text, 
+            CommandType commandType, 
+            TInput? Input, 
+            Action<DbCommand>? Setup,
+            Action<DbCommand, TInput?>? inSetup)
         {
             using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (SqlCommand command = new SqlCommand(text, connection))
+                using (SqlCommand command = new SqlCommand(text, connection))
             {
                 if (Setup != null)
                     Setup.Invoke(command);
+                if (inSetup != null)
+                    inSetup.Invoke(command, Input);
 
                 command.CommandType = commandType;
                 connection.Open();

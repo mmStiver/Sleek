@@ -85,6 +85,14 @@ namespace Sleek.DataAccess.SqlServer
                 return false;
             }
         }
+
+        public Task<int> ExecuteAsync(Write Query, object Input, Action<DbCommand, object?> Setup, CancellationToken cancellationToken = default)
+            => PostAsync<object>(Query.Text, CommandType.Text, Input, null, Setup, cancellationToken);
+
+        public Task<int> ExecuteAsync<TInput>(Write Query, TInput Input, Action<DbCommand, TInput?>? Setup, CancellationToken cancellationToken = default)
+            => PostAsync<TInput>(Query.Text, CommandType.Text, Input, null, Setup, cancellationToken);
+
+
         #endregion
 
     }

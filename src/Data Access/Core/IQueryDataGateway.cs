@@ -107,7 +107,24 @@ namespace Sleek.DataAccess.Core
         /// <param name="Setup">An optional action to configure the DbCommand before execution.</param>
         /// <returns>The number of rows affected by the query execution.</returns>
         int Execute(Write query, Action<DbCommand>? Setup);
-
+        /// <summary>
+        /// Executes a Write query (INSERT, UPDATE, DELETE) asynchronously and returns the number of rows affected.
+        /// </summary>
+        /// <param name="Query">The Write query object.</param>
+        /// <param name="input">The input parameter to be passed to the query.</param>
+        /// <param name="Setup">An optional action to configure the DbCommand and set the input parameter before execution.</param>
+        /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
+        /// <returns>A Task representing the number of rows affected.</returns>
+        int Execute(Write Query, object Input, Action<DbCommand, object>? Setup);
+        /// <summary>
+        /// Executes a Write query (INSERT, UPDATE, DELETE) asynchronously and returns the number of rows affected.
+        /// </summary>
+        /// <param name="Query">The Write query object.</param>
+        /// <param name="input">The input parameter to be passed to the query.</param>
+        /// <param name="Setup">An optional action to configure the DbCommand and set the input parameter before execution.</param>
+        /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
+        /// <returns>A Task representing the number of rows affected.</returns>
+        int Execute<TInput>(Write Query, TInput Input, Action<DbCommand, TInput>? Setup);
         /// <summary>
         /// Executes a Data Definition Language (DDL) query, such as CREATE TABLE or ALTER TABLE, and returns the number of rows affected.
         /// </summary>

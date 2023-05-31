@@ -143,6 +143,24 @@ namespace Sleek.DataAccess.Core
         /// <returns>A Task representing the number of rows affected.</returns>
         Task<int> ExecuteAsync(Write Query, Action<DbCommand>? Setup, CancellationToken cancellationToken = default);
         /// <summary>
+        /// Executes a Write query (INSERT, UPDATE, DELETE) asynchronously and returns the number of rows affected.
+        /// </summary>
+        /// <param name="Query">The Write query object.</param>
+        /// <param name="input">The input parameter to be passed to the query.</param>
+        /// <param name="Setup">An optional action to configure the DbCommand and set the input parameter before execution.</param>
+        /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
+        /// <returns>A Task representing the number of rows affected.</returns>
+        Task<int> ExecuteAsync(Write Query, object Input, Action<DbCommand, object>? Setup, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Executes a Write query (INSERT, UPDATE, DELETE) asynchronously and returns the number of rows affected.
+        /// </summary>
+        /// <param name="Query">The Write query object.</param>
+        /// <param name="input">The input parameter to be passed to the query.</param>
+        /// <param name="Setup">An optional action to configure the DbCommand and set the input parameter before execution.</param>
+        /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
+        /// <returns>A Task representing the number of rows affected.</returns>
+        Task<int> ExecuteAsync<TInput>(Write Query, TInput Input, Action<DbCommand, TInput>? Setup, CancellationToken cancellationToken = default);
+        /// <summary>
         /// Executes a DataDefinitionQuery (CREATE, ALTER, DROP) asynchronously and returns the number of rows affected.
         /// </summary>
         /// <param name="Query">The DataDefinitionQuery object.</param>

@@ -75,11 +75,16 @@ namespace Sleek.DataAccess.SQLite
             => Execute(Query, null);
 
         public int Execute(Write Query, Action<DbCommand>? Setup)
-            => Post(Query.Text, Setup);
+            => Post<object?>(Query.Text, null, Setup, null);
+        public int Execute(Write Query, object Input, Action<DbCommand, object>? Setup)
+            => Post<object?>(Query.Text, Input, null, Setup);
+
+        public int Execute<TInput>(Write Query, TInput Input, Action<DbCommand, TInput>? Setup)
+            => Post<TInput>(Query.Text, Input, null, Setup);
 
         public int Execute(DataDefinitionQuery Query)
-            => Post(Query.Text, null);
-
+            => Post<object?>(Query.Text, null, null, null);
+        
         public bool TestConnection()
         {
 
@@ -116,7 +121,7 @@ namespace Sleek.DataAccess.SQLite
         /// <param name="commandType">The type of the command (Text only).</param>
         /// <param name="Setup">An optional action to perform additional setup for the DbCommand.</param>
         /// <returns>The number of rows affected.</returns>
-        private int Post(string text, Action<DbCommand>? Setup)
+        private int Post<TInput>(string text, TInput Input, Action<DbCommand>? Setup, Action<DbCommand, TInput>? inSetup)
         {
             try
             {
@@ -125,9 +130,10 @@ namespace Sleek.DataAccess.SQLite
                 {
                     if (Setup != null)
                         Setup.Invoke(command);
+                    if (inSetup != null)
+                        inSetup.Invoke(command, Input);
 
                     command.CommandType = CommandType.Text;
-
                     return command.ExecuteNonQuery();
                 }
             }

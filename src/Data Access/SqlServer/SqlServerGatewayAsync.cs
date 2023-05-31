@@ -255,7 +255,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the number of rows affected.</returns>
         public async Task<int> ExecuteAsync(Write Query, Action<DbCommand>? Setup, CancellationToken cancellationToken = default)
-            => await Post(Query.Text, CommandType.Text, Setup, cancellationToken).ConfigureAwait(false);
+            => await PostAsync<object>(Query.Text, CommandType.Text, null, Setup, null, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Executes a SQL Data Definition Language (DDL) command asynchronously, such as CREATE, ALTER, DROP, etc.
@@ -264,7 +264,7 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the number of rows affected.</returns>
         public async Task<int> ExecuteAsync(DataDefinitionQuery Query, CancellationToken cancellationToken = default)
-            => await Post(Query.Text, CommandType.Text, null, cancellationToken).ConfigureAwait(false);
+            => await PostAsync<object>(Query.Text, CommandType.Text, null, null, null, cancellationToken).ConfigureAwait(false);
         #endregion
 
         /// <summary>
@@ -275,9 +275,11 @@ namespace Sleek.DataAccess.SqlServer
         /// <param name="Setup">An optional action to perform additional setup for the DbCommand.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>A task that represents the asynchronous operation. The task result is the number of rows affected.</returns>
-        private async Task<int> Post(string text,
+        private async Task<int> PostAsync<TInput>(string text,
            CommandType commandType,
+            TInput? Input,
            Action<DbCommand>? Setup,
+            Action<DbCommand, TInput?>? inSetup,
            CancellationToken cancellationToken)
         {
             SqlConnection connection = new SqlConnection(connectionConfiguration);
@@ -288,6 +290,8 @@ namespace Sleek.DataAccess.SqlServer
                 {
                     if (Setup != null)
                         Setup.Invoke(command);
+                    if (inSetup != null)
+                        inSetup.Invoke(command, Input);
                     command.CommandType = commandType;
                     connection.Open();
                     return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);

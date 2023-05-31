@@ -5,7 +5,7 @@ namespace Sleek.DataAcess.SQLiteTest.CommandTest
 {
     public class WriteTests : IClassFixture<SQLiteTestFixture>, IDisposable
     {
-
+        Address TestAddress;
         ISQLiteGateway gateway;
         public WriteTests(SQLiteTestFixture testFixture)
         {
@@ -14,6 +14,15 @@ namespace Sleek.DataAcess.SQLiteTest.CommandTest
             gateway.Execute(new DataDefinitionQuery() { Text = TestData.CreateAddressTable });
             gateway.Execute(new Write() { Text = TestData.InsertPhoneTable });
             gateway.Execute(new Write() { Text = TestData.InsertIntoAddressTable });
+            TestAddress = new Address
+            {
+                Id = 6,
+                State = "ON",
+                StreetAddress = "123 Fake Street",
+                City = "Windsor",
+                Country = "Canada",
+                PostalCode = "12345"
+            };
         }
 
         #region ExecuteDelete
@@ -113,6 +122,101 @@ namespace Sleek.DataAcess.SQLiteTest.CommandTest
             };
             object? result = gateway.Execute(query);
             Assert.Equal(3, result);
+        }
+        [Fact]
+        public void Execute_SetupAddressPassedByObject_ReturnInsertCount()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, object data) => {
+                Address address = (Address)data;
+                cmd.Parameters.Add(new SQLiteParameter("streetName", address.StreetAddress));
+                cmd.Parameters.Add(new SQLiteParameter("city", address.City));
+                cmd.Parameters.Add(new SQLiteParameter("state", address.State));
+                cmd.Parameters.Add(new SQLiteParameter("postalcode", address.PostalCode));
+                cmd.Parameters.Add(new SQLiteParameter("country", address.Country));
+            };
+            object? result = gateway.Execute(query, TestAddress, setup);
+            Assert.Equal(1, result);
+        }
+        [Fact]
+        public void Execute_SetupAddressPassedByObject_InputPassedToSetupFunction()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, object data) => {
+                Assert.IsType<Address>(data);
+                Address address = (Address)data;
+                Assert.Equal(TestAddress.StreetAddress, address.StreetAddress);
+                cmd.Parameters.Add(new SQLiteParameter("streetName", address.StreetAddress));
+                Assert.Equal(TestAddress.City, address.City);
+                cmd.Parameters.Add(new SQLiteParameter("city", address.City));
+                Assert.Equal(TestAddress.State, address.State);
+                cmd.Parameters.Add(new SQLiteParameter("state", address.State));
+                Assert.Equal(TestAddress.PostalCode, address.PostalCode);
+                cmd.Parameters.Add(new SQLiteParameter("postalcode", address.PostalCode));
+                Assert.Equal(TestAddress.Country, address.Country);
+                cmd.Parameters.Add(new SQLiteParameter("country", address.Country));
+            };
+            _ = gateway.Execute(query, TestAddress, setup);
+        }
+
+        [Fact]
+        public void Execute_T_SetupAddressPassedByType_ReturnInsertCount()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, Address data) => {
+                Address address = (Address)data;
+                cmd.Parameters.Add(new SQLiteParameter("streetName", address.StreetAddress));
+                cmd.Parameters.Add(new SQLiteParameter("city", address.City));
+                cmd.Parameters.Add(new SQLiteParameter("state", address.State));
+                cmd.Parameters.Add(new SQLiteParameter("postalcode", address.PostalCode));
+                cmd.Parameters.Add(new SQLiteParameter("country", address.Country)) ;
+            };
+            int result = gateway.Execute<Address>(query, TestAddress, setup);
+            Assert.Equal(1, result);
+        }
+        [Fact]
+        public void Execute_T_SetupAddressPassedByType_InputPassedToSetupFunction()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, Address data) => {
+                Address address = (Address)data;
+                Assert.Equal(TestAddress.StreetAddress, address.StreetAddress);
+                cmd.Parameters.Add(new SQLiteParameter("streetName", address.StreetAddress));
+                Assert.Equal(TestAddress.City, address.City);
+                cmd.Parameters.Add(new SQLiteParameter("city", address.City));
+                Assert.Equal(TestAddress.State, address.State);
+                cmd.Parameters.Add(new SQLiteParameter("state", address.State));
+                Assert.Equal(TestAddress.PostalCode, address.PostalCode);
+                cmd.Parameters.Add(new SQLiteParameter("postalcode", address.PostalCode));
+                Assert.Equal(TestAddress.Country, address.Country);
+                cmd.Parameters.Add(new SQLiteParameter("country", address.Country));
+            };
+            int result = gateway.Execute<Address>(query, TestAddress, setup);
+            Assert.Equal(1, result);
         }
         [Fact]
         public void Execute_UpdateSingleAddress_ReturnUpdateCount()

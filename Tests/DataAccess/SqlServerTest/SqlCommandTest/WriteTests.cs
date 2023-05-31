@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Data.SqlClient;
+using System.Net;
 
 
 namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
@@ -7,11 +8,14 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
     public class WriteTests : IClassFixture<SqlServerTestFixture>, IDisposable
     {
 
-        ISqlServerGateway facade;
+        ISqlServerGateway gateway;
         string connectionString;
+
+        public Address TestAddress { get; }
+
         public WriteTests(SqlServerTestFixture context)
         {
-            facade = new SqlServerGateway(context.connectionString);
+            gateway = new SqlServerGateway(context.connectionString);
             connectionString = context.connectionString;
 
             using (var connection = new SqlConnection(context.connectionString))
@@ -27,7 +31,15 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                     command.ExecuteNonQuery();
                 }
                     ;
-                
+                TestAddress = new Address
+                {
+                    Id = 6,
+                    State = "ON",
+                    StreetAddress = "123 Fake Street",
+                    City = "Windsor",
+                    Country = "Canada",
+                    PostalCode = "12345"
+                };
             }
         }
         #region ExecuteAsync
@@ -41,7 +53,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 VALUES('123 Main St', 'New York', 'NY', '10001', 'USA'); 
                 """
             };
-            object? result = await facade.ExecuteAsync(query);
+            object? result = await gateway.ExecuteAsync(query);
             Assert.IsType<int>(result);
         }
         [Fact]
@@ -56,7 +68,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                  ('789 Oak St', 'Chicago', 'IL', '60601', 'USA');
                 """
             };
-            object? result = await facade.ExecuteAsync(query);
+            object? result = await gateway.ExecuteAsync(query);
             Assert.Equal(3, result);
         }
         [Fact]
@@ -70,7 +82,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 Where Id = 1 
                 """
             };
-            object? result = await facade.ExecuteAsync(query);
+            object? result = await gateway.ExecuteAsync(query);
             Assert.Equal(1, result);
         }
         [Fact]
@@ -83,7 +95,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 Set Country = 'United States Of America'
                 """
             };
-            object? result = await facade.ExecuteAsync(query);
+            object? result = await gateway.ExecuteAsync(query);
             Assert.Equal(2, result);
         }
         [Fact]
@@ -109,7 +121,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 command.Parameters.Add(new SqlParameter("@postalCode", postalCode));
                 command.Parameters.Add(new SqlParameter("@country", country));
             };
-            object? result = await facade.ExecuteAsync(query, Setup);
+            object? result = await gateway.ExecuteAsync(query, Setup);
             Assert.IsType<int>(result);
         }
         [Fact]
@@ -135,9 +147,57 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 command.Parameters.Add(new SqlParameter("@postalCode", postalCode));
                 command.Parameters.Add(new SqlParameter("@country", country));
             };
-            object? result = await facade.ExecuteAsync(query, Setup);
+            object? result = await gateway.ExecuteAsync(query, Setup);
             Assert.Equal(1, result);
         }
+        [Fact]
+        public async Task ExecuteAsync_SetupAddressPassedByObject_ReturnInsertCount()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, object data) => {
+                Address address = (Address)data;
+                cmd.Parameters.Add(new SqlParameter("streetName", address.StreetAddress));
+                cmd.Parameters.Add(new SqlParameter("city", address.City));
+                cmd.Parameters.Add(new SqlParameter("state", address.State));
+                cmd.Parameters.Add(new SqlParameter("postalcode", address.PostalCode));
+                cmd.Parameters.Add(new SqlParameter("country", address.Country));
+            };
+            object? result = await gateway.ExecuteAsync(query, TestAddress, setup);
+            Assert.Equal(1, result);
+        }
+        [Fact]
+        public async Task ExecuteAsync_SetupAddressPassedByObject_InputPassedToSetupFunction()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, object data) => {
+                Assert.IsType<Address>(data);
+                Address address = (Address)data;
+                Assert.Equal(TestAddress.StreetAddress, address.StreetAddress);
+                cmd.Parameters.Add(new SqlParameter("streetName", address.StreetAddress));
+                Assert.Equal(TestAddress.City, address.City);
+                cmd.Parameters.Add(new SqlParameter("city", address.City));
+                Assert.Equal(TestAddress.State, address.State);
+                cmd.Parameters.Add(new SqlParameter("state", address.State));
+                Assert.Equal(TestAddress.PostalCode, address.PostalCode);
+                cmd.Parameters.Add(new SqlParameter("postalcode", address.PostalCode));
+                Assert.Equal(TestAddress.Country, address.Country);
+                cmd.Parameters.Add(new SqlParameter("country", address.Country));
+            };
+            _ = await gateway.ExecuteAsync(query, TestAddress, setup);
+        }
+
         [Fact]
         public async Task ExecuteAsync_UpdateparameterizedSingleAddress_ReturnUpdateCount()
         {
@@ -152,9 +212,10 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
             var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@addressId", 1));
             };
-            object? result = await facade.ExecuteAsync(query, Setup);
+            object? result = await gateway.ExecuteAsync(query, Setup);
             Assert.Equal(1, result);
         }       
+        
         #endregion
 
         #region Execute
@@ -168,7 +229,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 VALUES('123 Main St', 'New York', 'NY', '10001', 'USA'); 
                 """
             };
-            object? result = facade.Execute(query);
+            object? result = gateway.Execute(query);
             Assert.IsType<int>(result);
         }
         [Fact]
@@ -183,7 +244,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                  ('789 Oak St', 'Chicago', 'IL', '60601', 'USA');
                 """
             };
-            object? result = facade.Execute(query);
+            object? result = gateway.Execute(query);
             Assert.Equal(3, result);
         }
         [Fact]
@@ -197,7 +258,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 Where Id = 1 
                 """
             };
-            object? result = facade.Execute(query);
+            object? result = gateway.Execute(query);
             Assert.Equal(1, result);
         }
         [Fact]
@@ -210,7 +271,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 Set Country = 'United States Of America'
                 """
             };
-            object? result = facade.Execute(query);
+            object? result = gateway.Execute(query);
             Assert.Equal(2, result);
         }     
         [Fact]
@@ -236,7 +297,7 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 command.Parameters.Add(new SqlParameter("@postalCode", postalCode));
                 command.Parameters.Add(new SqlParameter("@country", country));
             };
-            object? result =  facade.Execute(query, Setup);
+            object? result =  gateway.Execute(query, Setup);
             Assert.IsType<int>(result);
         }
         [Fact]
@@ -262,9 +323,57 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
                 command.Parameters.Add(new SqlParameter("@postalCode", postalCode));
                 command.Parameters.Add(new SqlParameter("@country", country));
             };
-            object? result =  facade.Execute(query, Setup);
+            object? result =  gateway.Execute(query, Setup);
             Assert.Equal(1, result);
         }
+        [Fact]
+        public void Execute_SetupAddressPassedByObject_ReturnInsertCount()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, object data) => {
+                Address address = (Address)data;
+                cmd.Parameters.Add(new SqlParameter("streetName", address.StreetAddress));
+                cmd.Parameters.Add(new SqlParameter("city", address.City));
+                cmd.Parameters.Add(new SqlParameter("state", address.State));
+                cmd.Parameters.Add(new SqlParameter("postalcode", address.PostalCode));
+                cmd.Parameters.Add(new SqlParameter("country", address.Country));
+            };
+            object? result = gateway.Execute(query, TestAddress, setup);
+            Assert.Equal(1, result);
+        }
+        [Fact]
+        public void Execute_SetupAddressPassedByObject_InputPassedToSetupFunction()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, object data) => {
+                Assert.IsType<Address>(data);
+                Address address = (Address)data;
+                Assert.Equal(TestAddress.StreetAddress, address.StreetAddress);
+                cmd.Parameters.Add(new SqlParameter("streetName", address.StreetAddress));
+                Assert.Equal(TestAddress.City, address.City);
+                cmd.Parameters.Add(new SqlParameter("city", address.City));
+                Assert.Equal(TestAddress.State, address.State);
+                cmd.Parameters.Add(new SqlParameter("state", address.State));
+                Assert.Equal(TestAddress.PostalCode, address.PostalCode);
+                cmd.Parameters.Add(new SqlParameter("postalcode", address.PostalCode));
+                Assert.Equal(TestAddress.Country, address.Country);
+                cmd.Parameters.Add(new SqlParameter("country", address.Country));
+            };
+            _ = gateway.Execute(query, TestAddress, setup);
+        }
+
         [Fact]
         public void Execute_UpdateParameterizedSingleAddress_ReturnUpdateCount()
         {
@@ -279,11 +388,109 @@ namespace Sleek.DataAccess.SqlServerTest.DbCommandTest
             var Setup = (DbCommand command) => {
                 command.Parameters.Add(new SqlParameter("@addressId", 1));
             };
-            object? result =  facade.Execute(query, Setup);
+            object? result =  gateway.Execute(query, Setup);
             Assert.Equal(1, result);
         }
- 
+
         #endregion
+
+
+        [Fact]
+        public async Task ExecuteAsync_T_SetupAddressPassedByType_ReturnInsertCount()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, Address data) => {
+                Address address = (Address)data;
+                cmd.Parameters.Add(new SqlParameter("streetName", address.StreetAddress));
+                cmd.Parameters.Add(new SqlParameter("city", address.City));
+                cmd.Parameters.Add(new SqlParameter("state", address.State));
+                cmd.Parameters.Add(new SqlParameter("postalcode", address.PostalCode));
+                cmd.Parameters.Add(new SqlParameter("country", address.Country));
+            };
+            int result = await gateway.ExecuteAsync<Address>(query, TestAddress, setup);
+            Assert.Equal(1, result);
+        }
+        [Fact]
+        public async Task ExecuteAsync_T_SetupAddressPassedByType_InputPassedToSetupFunction()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, Address data) => {
+                Address address = (Address)data;
+                Assert.Equal(TestAddress.StreetAddress, address.StreetAddress);
+                cmd.Parameters.Add(new SqlParameter("streetName", address.StreetAddress));
+                Assert.Equal(TestAddress.City, address.City);
+                cmd.Parameters.Add(new SqlParameter("city", address.City));
+                Assert.Equal(TestAddress.State, address.State);
+                cmd.Parameters.Add(new SqlParameter("state", address.State));
+                Assert.Equal(TestAddress.PostalCode, address.PostalCode);
+                cmd.Parameters.Add(new SqlParameter("postalcode", address.PostalCode));
+                Assert.Equal(TestAddress.Country, address.Country);
+                cmd.Parameters.Add(new SqlParameter("country", address.Country));
+            };
+            int result = await gateway.ExecuteAsync<Address>(query, TestAddress, setup);
+            Assert.Equal(1, result);
+        }
+
+
+        [Fact]
+        public void Execute_T_SetupAddressPassedByType_ReturnInsertCount()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, Address data) => {
+                Address address = (Address)data;
+                cmd.Parameters.Add(new SqlParameter("streetName", address.StreetAddress));
+                cmd.Parameters.Add(new SqlParameter("city", address.City));
+                cmd.Parameters.Add(new SqlParameter("state", address.State));
+                cmd.Parameters.Add(new SqlParameter("postalcode", address.PostalCode));
+                cmd.Parameters.Add(new SqlParameter("country", address.Country));
+            };
+            int result = gateway.Execute<Address>(query, TestAddress, setup);
+            Assert.Equal(1, result);
+        }
+        [Fact]
+        public void Execute_T_SetupAddressPassedByType_InputPassedToSetupFunction()
+        {
+            var query = new Write()
+            {
+                Text = """
+                INSERT INTO Address (StreetAddress, City, State, PostalCode, Country)
+                VALUES(@streetName, @city, @state, @postalcode, @country);
+                """
+            };
+            var setup = (DbCommand cmd, Address data) => {
+                Address address = (Address)data;
+                Assert.Equal(TestAddress.StreetAddress, address.StreetAddress);
+                cmd.Parameters.Add(new SqlParameter("streetName", address.StreetAddress));
+                Assert.Equal(TestAddress.City, address.City);
+                cmd.Parameters.Add(new SqlParameter("city", address.City));
+                Assert.Equal(TestAddress.State, address.State);
+                cmd.Parameters.Add(new SqlParameter("state", address.State));
+                Assert.Equal(TestAddress.PostalCode, address.PostalCode);
+                cmd.Parameters.Add(new SqlParameter("postalcode", address.PostalCode));
+                Assert.Equal(TestAddress.Country, address.Country);
+                cmd.Parameters.Add(new SqlParameter("country", address.Country));
+            };
+            int result = gateway.Execute<Address>(query, TestAddress, setup);
+            Assert.Equal(1, result);
+        }
 
         public void Dispose()
         {
