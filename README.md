@@ -1,8 +1,10 @@
-#Sleek
+# Sleek
+
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-donate-yellow.svg)](https://www.buymeacoffee.com/mmstiver)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
 
 Sleek is a lightweight and easy-to-use library designed to simplify ADO.NET boilerplate code. It provides a minimalistic and straightforward approach to execute SQL queries and stored procedures, enabling developers to focus on their application logic. Sleek offers both synchronous and asynchronous execution methods, as well as support for custom command setup and result mapping.
-Table of Contents
 
 # Table of Contents
 
@@ -23,10 +25,76 @@ Table of Contents
 
 ## Overview
 
-Sleek provides an abstraction over ADO.NET, offering a simplified API to interact with databases. It offers methods to execute SQL queries and stored procedures, along with optional setup and mapper functions to fine-tune command execution and result processing.
-Getting Started
+Sleek provides an abstraction over ADO.NET, offering a simplified API to interact with any database. It offers methods to execute SQL queries and stored procedures, along with optional setup and mapper functions to fine-tune command execution and result processing. In scenarios where you don't need a full ORM, and you just want to quickly script out some queries, Sleek offers the ability to create succinct C# data access code.
 
-To start using Sleek, install the library via NuGet and create an instance of SqlServerGateway (or another data gateway implementation, if available) with the appropriate connection string.
+```
+  var gateway = new SqlServerGateway(connectionString);
+  var insertPersonSql = new Write(){Text = "INSERT INTO Person (Name, Age) OUTPUT INSERTED.Id VALUES (@Name, @Age)"};
+  gateway.Execute(insertPersonSql, (cmd) =>
+    {
+        cmd.Parameters.AddWithValue("@Name", "Mike");
+        cmd.Parameters.AddWithValue("@Age", 15);
+    }, out int insertedId);
+    
+  var selectQuery = new Select(){Text = "SELECT * FROM Person WHERE Id = @Id"};
+  gateway.Execute<Person>(selectQuery, (cmd) =>cmd.Parameters.AddWithValue("@Id", insertedId),
+    (DbDataReader reader) => 
+   {
+      var person = new Person();
+     while (reader.Read())
+     {
+         person.Id = reader.GetInt32(reader.GetOrdinal("Id"));
+         person.Name = reader.GetString(reader.GetOrdinal("Name"));
+         person.Age = reader.GetInt32(reader.GetOrdinal("Age"));
+      }
+      return person;
+    });
+```
+
+Compared to the traditional ado.net code to query Sql Server, which can easily become a mess of nested brackets:
+
+```    
+using (SqlConnection conn = new SqlConnection(connectionString))
+    {
+        await conn.OpenAsync(cancellationToken);
+
+        // INSERT
+        string insertSql = "INSERT INTO Person (Name, Age) OUTPUT INSERTED.Id VALUES (@Name, @Age);";
+        using (SqlCommand cmd = new SqlCommand(insertSql, conn))
+        {
+            cmd.Parameters.AddWithValue("@Name", name);
+            cmd.Parameters.AddWithValue("@Age", age);
+
+            // Get the inserted id
+            int insertedId = (int)await cmd.ExecuteScalarAsync(cancellationToken);
+
+            // SELECT
+            string selectSql = "SELECT * FROM Person WHERE Id = @Id";
+            using (SqlCommand selectCmd = new SqlCommand(selectSql, conn))
+            {
+                selectCmd.Parameters.AddWithValue("@Id", insertedId);
+
+                using (SqlDataReader reader = await selectCmd.ExecuteReaderAsync(cancellationToken))
+                {
+                    if (await reader.ReadAsync(cancellationToken))
+                    {
+                        return new Person()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Age = reader.GetInt32(reader.GetOrdinal("Age")),
+                        };
+                    }
+                }
+            }
+        }
+  }
+}
+```
+
+## Getting Started
+
+To start using Sleek, install the library via NuGet or Github and create an instance of SqlServerGateway (or another data gateway implementation, if available) with the appropriate connection string.
 
 ```csharp
 
