@@ -43,7 +43,7 @@ namespace Sleek.DataAccess.SqlServerTest
 
             using (var connection = new SqlConnection(localDatabase))
             {
-                connection.Open();
+                 connection.Open();
 
                 // Create a table
                 if (!TableExists(connection, TestData.TestTableName))
@@ -59,6 +59,16 @@ namespace Sleek.DataAccess.SqlServerTest
                         command.ExecuteNonQuery();
                     }
                 }
+                if (!TableExists(connection, "InsertCmdTestLong"))
+                    CreateTempTable(connection, "InsertCmdTestLong", typeof(long));
+                if (!TableExists(connection, "InsertCmdTestInt"))
+                    CreateTempTable(connection, "InsertCmdTestInt", typeof(int));
+                if (!TableExists(connection, "InsertCmdTestShort"))
+                    CreateTempTable(connection, "InsertCmdTestShort", typeof(short));
+                if (!TableExists(connection, "InsertCmdTestByte"))
+                    CreateTempTable(connection, "InsertCmdTestByte", typeof(byte));
+                if (!TableExists(connection, "InsertCmdTestGuid"))
+                    CreateTempTable(connection, "InsertCmdTestGuid", typeof(Guid));
 
                 using (var command = new SqlCommand(TestData.GetPersonProcedure.Code, connection))
                     command.ExecuteNonQuery();
@@ -141,7 +151,7 @@ namespace Sleek.DataAccess.SqlServerTest
                      command.Parameters.AddWithValue("@procName", procName);
 
                     object? val = command.ExecuteScalar();
-                    return (val != DBNull.Value) ? ((int)val) == 1: false;
+                    return (val == null || val == DBNull.Value) ? false : ((int)val) == 1;
                     
                 }
 
@@ -164,20 +174,61 @@ namespace Sleek.DataAccess.SqlServerTest
             }
         }
 
+        private void DropTempTable(SqlConnection connection, String TableName)
+        {
+            using (var cmd = new SqlCommand($"DROP TABLE {TableName}", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+        private void CreateTempTable(SqlConnection connection, String TableName, Type t)
+        {
+            if (t == typeof(Guid)) {
+                using (var cmd = new SqlCommand(GetUUIDTempTableQuery(TableName), connection))
+                    cmd.ExecuteNonQuery();
+            }
+            else
+            { 
+                using (var cmd = new SqlCommand(GetTempTableQuery(TableName, t), connection))
+                    cmd.ExecuteNonQuery();
+            }
+        }
+
+        private string GetTempTableQuery(String TableName, Type t)
+            => $"CREATE TABLE {TableName} ( MyID {GetIdentityString(t)} PRIMARY KEY IDENTITY(1,1), IsTrue BIT)";
+        private string GetUUIDTempTableQuery(String TableName)
+            => $"CREATE TABLE {TableName} ( MyID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(), IsTrue BIT)";
+       
+        
+        private string GetIdentityString(Type t)
+            => t switch
+            {
+                var type when t == typeof(Int64) => "BIGINT",
+                var type when t == typeof(Int32) => "INT",
+                var type when t == typeof(Int16) => "SmallINT",
+                var type when t == typeof(byte) => "TINYINT",
+                _ => throw new NotSupportedException()
+
+            };
+
+        //var type when t == typeof(Guid) => "UNIQUEIDENTIFIER",
 
         public void Dispose()
         {
-           // using (var connection = new SqlConnection(this.connectionString))
-           //     TruncateData(connection, TestData.TestTableName);
-       // }
-            // {
-            //     connection.Open();
-            //
-            //     using (var command = new SqlCommand($"CREATE TABLE #TestTemp", connection))
-            //     {
-            //         command.ExecuteNonQuery();
-            //     }
-            // }
+            using (var connection = new SqlConnection(this.connectionString))
+            {
+                connection.Open();
+                if (!TableExists(connection, "InsertCmdTestInt"))
+                    DropTempTable(connection, "InsertCmdTestInt");
+                if (!TableExists(connection, "InsertCmdTestLong"))
+                    DropTempTable(connection, "InsertCmdTestLong");
+                if (!TableExists(connection, "InsertCmdTestShort"))
+                    DropTempTable(connection, "InsertCmdTestShort");
+                if (!TableExists(connection, "InsertCmdTestByte"))
+                    DropTempTable(connection, "InsertCmdTestByte");
+                if (!TableExists(connection, "InsertCmdTestGuid"))
+                    DropTempTable(connection, "InsertCmdTestGuid");
+            }
         }
     }
     

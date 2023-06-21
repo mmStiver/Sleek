@@ -8,7 +8,7 @@
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <PackageId>Sleek.DataAccess.SqlServer</PackageId>
-	  <Version>1.2.0</Version>
+	  <Version>1.3.0</Version>
 	  <Authors>Michael Stiver-Balla</Authors>
 	  <Product>Sleek DataAccess Library for Sql Server</Product>
 	  <Description>A sleek and modern data access library for all your Sql Serverneeds.</Description>

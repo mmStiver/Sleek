@@ -1,6 +1,6 @@
 ﻿using System.Data.Common;
 
-namespace Sleek.DataAcess.SQLiteTest.CommandTest
+namespace Sleek.DataAccess.SQLiteTest.CommandTest
 {
     public class SelectScalarResults : IClassFixture<SQLiteTestFixture>
     {

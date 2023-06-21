@@ -256,6 +256,77 @@ namespace Sleek.DataAccess.SqlServer
         /// <returns>A task that represents the asynchronous operation. The task result is the number of rows affected.</returns>
         public async Task<int> ExecuteAsync(Write Query, Action<DbCommand>? Setup, CancellationToken cancellationToken = default)
             => await PostAsync<object>(Query.Text, CommandType.Text, null, Setup, null, cancellationToken).ConfigureAwait(false);
+        public Task<int> ExecuteAsync(Write Query, object Input, Action<DbCommand, object?> Setup, CancellationToken cancellationToken = default)
+           => PostAsync<object>(Query.Text, CommandType.Text, Input, null, Setup, cancellationToken);
+
+        public Task<int> ExecuteAsync<TInput>(Write Query, TInput Input, Action<DbCommand, TInput?>? Setup, CancellationToken cancellationToken = default)
+            => PostAsync<TInput>(Query.Text, CommandType.Text, Input, null, Setup, cancellationToken);
+
+        public async Task<object> ExecuteAsync(Insert Query, CancellationToken cancellationToken = default)
+            => await ExecuteAsync(Query, (Action<DbCommand>?)null, cancellationToken);
+        public async Task<object?> ExecuteAsync(Insert Query, Action<DbCommand>? ActionSetup, CancellationToken cancellationToken = default)
+        => await ExecuteAsync(Query, null, ActionSetup, null, cancellationToken);
+        public async Task<object?> ExecuteAsync(Insert Query, object Input,
+          Action<DbCommand, object>? ParamSetup,
+          CancellationToken cancellationToken = default)
+        => await ExecuteAsync(Query, Input, null, ParamSetup, cancellationToken);
+        public async Task<TOutput?> ExecuteAsync<TOutput>(Insert Query, Action<DbCommand>? Setup, CancellationToken cancellationToken = default) where TOutput : struct
+            =>(TOutput) (await ExecuteAsync(Query, null, Setup, null, cancellationToken));
+        
+        private async Task<object?> ExecuteAsync(Insert Query, object? Input,
+            Action<DbCommand>? ActionSetup,
+            Action<DbCommand, object>? ParamSetup,
+            CancellationToken cancellationToken = default)
+        {
+            using (SqlConnection conn = new SqlConnection(this.connectionConfiguration))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand((string)Query, conn))
+                {
+                    if (ActionSetup != null) ActionSetup.Invoke(cmd);
+                    if (ParamSetup != null) ParamSetup.Invoke(cmd, Input);
+                    return await cmd.ExecuteScalarAsync(cancellationToken);
+                }
+            }
+        }
+     
+        public async Task<Nullable<TOutput>> ExecuteAsync<TInput, TOutput>(Insert Query, TInput? Input,
+            Action<DbCommand, TInput>? ParamSetup,
+            CancellationToken cancellationToken = default)
+            where TOutput : struct
+        {
+            using (SqlConnection conn = new SqlConnection(this.connectionConfiguration))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand((string)Query, conn))
+                {
+                    if (ParamSetup != null) ParamSetup.Invoke(cmd, Input);
+                    var newId =  await cmd.ExecuteScalarAsync(cancellationToken);
+                    return (newId != null && newId is not DBNull && newId is TOutput)
+                        ? new Nullable<TOutput>((TOutput)Convert.ChangeType(newId, typeof(TOutput)))
+                        : null;
+                }
+            }
+        }
+
+        public async Task<Nullable<TOutput>> ExecuteAsync<TOutput>(Insert Query, CancellationToken cancellationToken = default)
+            where TOutput : struct
+            => await ExecuteAsync<TOutput>(Query, (Action<DbCommand, object> ?)null, cancellationToken);
+        public async Task<Nullable<TOutput>> ExecuteAsync<TOutput>(Insert Query, Action<DbCommand, object>? Setup, CancellationToken cancellationToken = default) 
+            where TOutput : struct
+        {
+            using (SqlConnection conn = new SqlConnection(this.connectionConfiguration))
+            {
+                conn.Open();
+                using (SqlCommand cmd = new SqlCommand((string)Query, conn))
+                {
+                    var newId = await cmd.ExecuteScalarAsync(cancellationToken);                   
+                    return (newId !=null &&  newId is not DBNull && newId is TOutput)
+                        ? new Nullable<TOutput>((TOutput)Convert.ChangeType(newId, typeof(TOutput)))
+                        : null;
+                }
+            }
+        }
 
         /// <summary>
         /// Executes a SQL Data Definition Language (DDL) command asynchronously, such as CREATE, ALTER, DROP, etc.
@@ -319,7 +390,7 @@ namespace Sleek.DataAccess.SqlServer
                     var scalar = await command.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
                     return (scalar is not DBNull)
                         ? (TOutput)scalar
-                        : default(TOutput?); ;
+                        : default(TOutput?);
                 }
             }
         }
@@ -468,5 +539,6 @@ namespace Sleek.DataAccess.SqlServer
                 }
             }
         }
+
     }
 }

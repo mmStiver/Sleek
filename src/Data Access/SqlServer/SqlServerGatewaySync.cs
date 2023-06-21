@@ -195,6 +195,25 @@ namespace Sleek.DataAccess.SqlServer
         public int Execute<TInput>(Write Query, TInput Input, Action<DbCommand, TInput>? Setup)
         => Post<TInput>(Query.Text, CommandType.Text, Input, null, Setup);
 
+        public object? Execute(Insert Query)
+            => Execute(Query, null, null);
+
+        public object? Execute(Insert Query, Action<DbCommand>? Setup)
+            => GetSingle<object>(Query.Text, CommandType.Text, Setup);
+
+        public object? Execute(Insert Query, object Input, Action<DbCommand, object>? Setup)
+            => GetSingle<object>(Query.Text, CommandType.Text, Input, Setup);
+
+
+        public TOutput Execute<TOutput>(Insert Query) where TOutput : struct
+            => GetSingle<TOutput>(Query.Text, CommandType.Text, null);
+        
+        public TOutput? Execute<TOutput>(Insert Query, Action<DbCommand>? Setup) where TOutput : struct
+            => GetSingle<TOutput>(Query.Text, CommandType.Text, Setup);
+
+        public TOutput? Execute<TInput, TOutput>(Insert Query, TInput Input, Action<DbCommand, TInput>? Setup) where TOutput : struct
+            => GetSingle<TInput, TOutput>(Query.Text, CommandType.Text, Input, Setup);
+
         /// <summary>
         /// Executes a DataDefinitionQuery and returns the number of rows affected.
         /// </summary>
@@ -312,18 +331,16 @@ namespace Sleek.DataAccess.SqlServer
           Func<DbDataReader, TOutput> Mapper
             )
         {
-            using (SqlConnection connection = new SqlConnection(connectionConfiguration))
-            using (DbCommand command = new SqlCommand(text, connection))
-            {
-                if (Setup != null)
-                    Setup.Invoke(command);
+            using SqlConnection connection = new SqlConnection(connectionConfiguration);
+            using DbCommand command = new SqlCommand(text, connection);
+            if (Setup != null)
+                Setup.Invoke(command);
 
-                command.CommandType = commandType;
-                connection.Open();
+            command.CommandType = commandType;
+            connection.Open();
 
-                DbDataReader reader = command.ExecuteReader();
-                return Mapper.Invoke(reader);
-            }
+            DbDataReader reader = command.ExecuteReader();
+            return Mapper.Invoke(reader);
         }
         /// <summary>
         /// Executes a command with an input parameter and maps the result set to a single output using the provided mapper function.

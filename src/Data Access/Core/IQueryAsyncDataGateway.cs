@@ -160,6 +160,13 @@ namespace Sleek.DataAccess.Core
         /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
         /// <returns>A Task representing the number of rows affected.</returns>
         Task<int> ExecuteAsync<TInput>(Write Query, TInput Input, Action<DbCommand, TInput>? Setup, CancellationToken cancellationToken = default);
+        Task<object> ExecuteAsync(Insert Query, CancellationToken cancellationToken = default);
+        Task<object> ExecuteAsync(Insert Query, Action<DbCommand>? Setup, CancellationToken cancellationToken = default);
+        Task<object> ExecuteAsync(Insert Query, object Input, Action<DbCommand, object>? Setup, CancellationToken cancellationToken = default);
+        Task<Nullable<TOutput>> ExecuteAsync<TOutput>(Insert Query, CancellationToken cancellationToken = default) where TOutput : struct;
+        Task<Nullable<TOutput>> ExecuteAsync<TOutput>(Insert Query, Action<DbCommand>? Setup, CancellationToken cancellationToken = default) where TOutput : struct;
+        Task<Nullable<TOutput>> ExecuteAsync<TInput, TOutput>(Insert Query, TInput Input, Action<DbCommand, TInput>? Setup, CancellationToken cancellationToken = default) where TOutput : struct;
+
         /// <summary>
         /// Executes a DataDefinitionQuery (CREATE, ALTER, DROP) asynchronously and returns the number of rows affected.
         /// </summary>

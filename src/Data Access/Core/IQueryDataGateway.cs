@@ -125,6 +125,15 @@ namespace Sleek.DataAccess.Core
         /// <param name="cancellationToken">An optional cancellation token to cancel the operation.</param>
         /// <returns>A Task representing the number of rows affected.</returns>
         int Execute<TInput>(Write Query, TInput Input, Action<DbCommand, TInput>? Setup);
+        object? Execute(Insert Query);
+        object? Execute(Insert Query, Action<DbCommand>? Setup);
+        object? Execute(Insert Query, object Input, Action<DbCommand, object>? Setup);
+
+        TOutput Execute<TOutput>(Insert Query) where TOutput : struct;
+        Nullable<TOutput> Execute<TOutput>(Insert Query, Action<DbCommand>? Setup) where TOutput : struct;
+        Nullable<TOutput> Execute<TInput, TOutput>(Insert Query, TInput Input, Action<DbCommand, TInput>? Setup) where TOutput : struct;
+
+        // out TOutput inserted
         /// <summary>
         /// Executes a Data Definition Language (DDL) query, such as CREATE TABLE or ALTER TABLE, and returns the number of rows affected.
         /// </summary>

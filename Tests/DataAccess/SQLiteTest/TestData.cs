@@ -67,5 +67,14 @@ namespace Sleek.DataAccess.SQLiteTest
             ('Daniel', 'Wilson', '1995-04-03', 26, 0, 1.79, 68.3, '2023-05-05', '2023-05-06', 'Some additional info 5', x'0011223344556677', 85000.60, '2345678901', 'MNO345');
             """;
 
+
+        public static readonly string CreateIntegerAutoIncrementTable = """
+            CREATE TABLE IntegerTestTable (
+             id INTEGER PRIMARY KEY AUTOINCREMENT,
+             column1 TEXT,
+             column2 INTEGER
+         );
+         """;
+
     }
 }

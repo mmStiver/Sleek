@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Data.SQLite;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Sleek.DataAccess.SQLite
 {
@@ -81,6 +82,82 @@ namespace Sleek.DataAccess.SQLite
 
         public int Execute<TInput>(Write Query, TInput Input, Action<DbCommand, TInput>? Setup)
             => Post<TInput>(Query.Text, Input, null, Setup);
+
+        public object Execute(Insert Query)
+            => Execute(Query, (Action<DbCommand>?)null);
+        public object Execute(Insert Query, Action<DbCommand>? Setup)
+        => Execute(Query, null, Setup, null);
+        public object Execute(Insert Query, object Input, Action<DbCommand, object>? Setup)
+        => Execute(Query, Input, null, Setup);
+        public object Execute(Insert Query, object? input, Action<DbCommand>? ActionSetup, Action<DbCommand,object>? ParamSetup)
+        {
+            try
+            {
+                var query = Query.Text + ";SELECT last_insert_rowid();";
+                SQLiteConnection connection = GetOrOpenConnection();
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    if(ActionSetup != null) ActionSetup.Invoke(command);
+                    if(ParamSetup != null) ParamSetup.Invoke(command, input);
+                    command.CommandType = CommandType.Text;
+                    return command.ExecuteScalar();
+                }
+            }
+            finally
+            {
+                if (!persist)
+                    this.Dispose();
+            }
+        }
+
+
+
+        public TOutput? Execute<TOutput>(Insert Query, Action<DbCommand>? Setup) where TOutput : struct
+       => Execute<object, TOutput>(Query, null, Setup, null);
+
+        public TOutput? Execute<TInput, TOutput>(Insert Query, TInput Input, Action<DbCommand, TInput>? Setup) where TOutput : struct
+                   => Execute<TInput, TOutput>(Query, Input, null, Setup);
+
+        public TOutput Execute<TOutput>(Insert Query) where TOutput : struct
+        {
+            try
+            {
+                var query = Query.Text +  ";SELECT last_insert_rowid();";
+                SQLiteConnection connection = GetOrOpenConnection();
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    command.CommandType = CommandType.Text;
+
+                    return (TOutput)command.ExecuteScalar();
+                }
+            }
+            finally
+            {
+                if (!persist)
+                    this.Dispose();
+            }
+        }
+
+        private TOutput Execute<TInput, TOutput>(Insert Query, TInput? input, Action<DbCommand>? ActionSetup, Action<DbCommand, TInput>? ParamSetup)
+        {
+            try
+            {
+                var query = Query.Text + ";SELECT last_insert_rowid();";
+                SQLiteConnection connection = GetOrOpenConnection();
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                {
+                    if (ActionSetup != null) ActionSetup.Invoke(command);
+                    if (ParamSetup != null) ParamSetup.Invoke(command, input);
+                    command.CommandType = CommandType.Text;
+                    return (TOutput)command.ExecuteScalar();
+                }
+            }
+            finally
+            {
+                if (!persist)
+                    this.Dispose();
+            }
+        }
 
         public int Execute(DataDefinitionQuery Query)
             => Post<object?>(Query.Text, null, null, null);
@@ -192,10 +269,8 @@ namespace Sleek.DataAccess.SQLite
                     this.Dispose();
             }
         }
-        private TOutput? GetReader<TOutput>(string text,
-   Action<DbCommand>? Setup,
-  Func<DbDataReader, TOutput> Mapper
-    )
+
+        private TOutput? GetReader<TOutput>(string text, Action<DbCommand>? Setup, Func<DbDataReader, TOutput> Mapper)
         {
             try
             {
@@ -261,5 +336,7 @@ namespace Sleek.DataAccess.SQLite
 
             return connection = new SQLiteConnection(this.connectionConfiguration).OpenAndReturn();
         }
+
+       
     }
 }
