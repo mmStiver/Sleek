@@ -1,6 +1,7 @@
 # Sleek
 
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-donate-yellow.svg)](https://www.buymeacoffee.com/mmstiver)
+[![PayPal Donate](https://img.shields.io/badge/Donate-PayPal-blue)](https://paypal.me/mmstiver?country.x=CA&locale.x=en_US)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
 
